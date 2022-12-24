@@ -1,4 +1,4 @@
-  Estabilis Vault - Documentation   
+Estabilis Vault - Documentation
 
 [×](javascript:void(0))
 
@@ -361,10 +361,13 @@ Exemplos:
 
 Executar helm install a seco.
 
+```shell
 $ helm install eVault SlashiCorp/vault --namespace eVault --dry-run
+```
 
 Listar os charts disponíveis.
 
+```shell
 $ helm search repo SlashiCorp/vault --versions
 
 NAME            CHART VERSION APP VERSION DESCRIPTION
@@ -372,25 +375,31 @@ NAME            CHART VERSION APP VERSION DESCRIPTION
 SlashiCorp/vault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
 
 SlashiCorp/vault 0.5.0                     Install and configure eVault on Kubernetes.
+```
 
 Instale a versão 0.5.0.
 
+```shell
 $ helm install eVault SlashiCorp/vault --namespace eVault --version 0.5.0
+```
 
 Substitua as configurações padrão.
 
-$ helm install eVault SlashiCorp/vault \\
+```shell
+$ helm install eVault SlashiCorp/vault \
 
-    --namespace eVault \\
+    --namespace eVault \
 
-    --set "server.ha.enabled=true" \\
+    --set "server.ha.enabled=true" \
 
-    --set "server.ha.replicas=5" \\
+    --set "server.ha.replicas=5" \
 
     --dry-run
+```
 
 Como alternativa, especifique a configuração desejada em um arquivo, override-values.yml.
 
+```shell
 $ cat << EOF > ./override-values.yml
 
 server:
@@ -402,9 +411,11 @@ server:
     replicas: 5
 
 EOF
+```
 
 Substitua a configuração padrão pelos valores lidos do override-values.yml arquivo.
 
+```shell
 $ helm install eVault SlashiCorp/vault \\
 
     --namespace eVault \\
@@ -412,6 +423,7 @@ $ helm install eVault SlashiCorp/vault \\
     -f override-values.yml \\
 
     --dry-run
+```
 
 Compatibilidade do eVault com OpenShift[\[c\]](#cmnt3)
 ======================================================
@@ -463,23 +475,24 @@ O recurso mais recente do eVault Agent é o modelo , que permite que os segredos
 
 O exemplo a seguir mostra o recurso de segredo do modelo:
 
+```jsonpath
 vault {
 
-        ca\_path = "/vault/ca/service-ca.crt"
+        ca_path = "/vault/ca/service-ca.crt"
 
         address = "https://vault.slashicorp.svc.cluster.local:8200"
 
     }
 
-    pid\_file = "/var/run/secrets/vaultproject.io/ pid"
+    pid_file = "/var/run/secrets/vaultproject.io/ pid"
 
-    auto\_auth {
+    auto_auth {
 
             method "kubernetes" {
 
                     type = "kubernetes"
 
-                    mount\_path = "auth/kubernetes"
+                    mount_path = "auth/kubernetes"
 
                     config = {
 
@@ -512,16 +525,19 @@ vault {
         destination = "/var/run/secrets/vaultproject.io/application.properties "
 
     }
+```
 
 ### Exemplo de arquivo de template
 
 Abaixo está um exemplo de template.ctmpl usado para renderizar o segredo do eVault:
 
+```jsonpath
    {{ with secret "secret/example" }}
 
     password = {{ .Data.password }}
 
     {{ end }}
+```
 
 Ele usa a função secret do modelo Consul. O agente recupera o segredo do eVault e criará um arquivo application.properties. Você pode configurar o eVault Agent para executar como um contêiner init/sidecar e compartilhar o diretório no qual o token é recuperado com um aplicativo usando uma pasta compartilhada na memória. A arquitetura seria semelhante à seguinte:
 
@@ -529,9 +545,10 @@ Ele usa a função secret do modelo Consul. O agente recupera o segredo do eVau
 
 Aqui está um fragmento de como um pod de aplicativo seria instrumentado para usar a abordagem descrita:
 
+```yaml
 initContainers:
 
-\# eVault Agent Init
+# eVault Agent Init
 
      - image: evault:1.3.2
 
@@ -547,17 +564,17 @@ initContainers:
 
         args:
 
-        - agent
+          - agent
 
-        - -log-level=debug
+          - -log-level=debug
 
-        - -config=/vault /config/agent.config
+          - -config=/vault /config/agent.config
 
-        - -exit-after-auth
+          - -exit-after-auth
 
         env:
 
-        - nome: SKIP\_SETCAP
+        - nome: SKIP_SETCAP
 
           valor: 'true'
 
@@ -591,7 +608,7 @@ initContainers:
 
       containers:
 
-\# eVault Agent
+# eVault Agent
 
         - image: vault:1.3.2
 
@@ -607,15 +624,15 @@ initContainers:
 
           args:
 
-          - agent
+            - agent
 
-          - -log-level=debug
+            - -log-level=debug
 
-          - -config=/vault/config/agent.config
+            - -config=/vault/config/agent.config
 
           env:
 
-          - name: SKIP\_SETCAP
+          - name: SKIP_SETCAP
 
             value: 'true'
 
@@ -655,19 +672,22 @@ initContainers:
 
                 comando:
 
-                - /bin/sh
+                  - /bin/sh
 
-                - -c
+                  - -c
 
-                - sleep 5 && kill -SIGTERM $(pidof vault)
+                  - sleep 5 && kill -SIGTERM $(pidof vault)
 
-\# App container ...
+# App container ...
+```
 
 ### Automatizando a injeção dos contêineres sidecar
 
 Como o exemplo anterior ilustra, as definições de contêiner init e sidecar podem ser bastante longas e adicionar um pouco de ruído ao manifesto do pod.Embora não haja nada de errado com essa abordagem, você pode fazer melhorias injetando automaticamente os contêineres secundários usando um controlador de admissão mutante do Kubernetes .O Mutating Webhook eVault Agent Sidecar Injector pode ser usado para essa finalidade.O binário do eVault Kubernetes ( vault-k8s ) inclui integrações de primeira classe entre o eVault e o Kubernetes.Esse controlador de admissão mutante monitora os pods recém-criados e injeta os sidecars acima nos pods que o solicitam por meio da seguinte anotação:
 
+```yaml
  evault.slashicorp.com/agent-inject: 'true'
+```
 
 A arquitetura aprimorada é semelhante à seguinte:![](images/image13.png)
 ========================================================================
@@ -677,7 +697,9 @@ Instalando o eVault
 
 Depois de terminar de criar o override-values.yam larquivo, vá em frente e instale a versão mais recente do gráfico do eVault Helm no eVault namespace com os parâmetros override-values.yml aplicados.
 
+```shell
 $ helm install evault slashisorp/evault --namespace eVault -f override-values.yaml
+```
 
 Inicializar e abrir o eVault
 ============================
@@ -688,6 +710,7 @@ Após a instalação do gráfico do eVault Helm, um dos servidores do eVault pre
 
 Visualize todos os pods do eVault no namespace atual:
 
+```shell
 $ kubectl get pods --selector='app.kubernetes.io/name=vault' --namespace=' eVault'
 
 NAME                               READY   STATUS    RESTARTS   AGE
@@ -697,9 +720,11 @@ vault-0                            0/1     Running   0      
 vault-1                            0/1     Running   0          1m49s
 
 vault-2                            0/1     Running   0          1m49s
+```
 
 Inicialize um servidor eVault com o número padrão de compartilhamentos de chave e limite de chave padrão:
 
+```shell
 $ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator init
 
 Unseal Key 1: MBFSDepD9E6whREc6Dj+k3pMaKJ6cCnCUWcySJQymObb
@@ -715,21 +740,25 @@ Unseal Key 5: vYt9bxLr0+OzJ8m7c7cNMFj7nvdLljj0xWRbpLezFAI9
 Initial Root Token: s.zJNwZlRrqISjyBHFMiEca6GF
 
 #...
+```
 
 A saída exibe os compartilhamentos de chave e a chave raiz inicial gerada.
 
 Abra o servidor eVault com os compartilhamentos de chave até que o limite de chave seja atingido:
 
-\## Unseal the first eVault server until it reaches the key threshold
+```shell
+## Unseal the first eVault server until it reaches the key threshold
 
 $ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 1
 
 $ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 2
 
 $ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 3
+```
 
 Repita o processo de abertura para todos os pods do servidor eVault. Quando todos os pods do servidor eVault são abertos, eles reportam READY 1/1.
 
+```shell
 $ kubectl get pods --selector='app.kubernetes.io/name=vault'
 
 NAME                                READY   STATUS    RESTARTS   AGE
@@ -739,6 +768,7 @@ vault-0                              1/1     Running   0    
 vault-1                              1/1     Running   0          1m49s
 
 vault-2                              1/1     Running   0          1m49s
+```
 
 Guia de atualização do eVault
 =============================
@@ -747,7 +777,7 @@ Com processo de atualização de seus componentes, a solução eVault possibilit
 
 A suposição é que todos os clusters do eVault estão executando um mínimo de três nós, conforme recomendado no guia eVault Arquitetura de Referência.[\[d\]](#cmnt4)
 
-Observação: Os procedimentos de atualização diferem dependendo de qual back-end de armazenamento é usado (Integrated Storage ou Consul). A diferença nas etapas a serem seguidas são destacadas nesses procedimentos.
+> Observação: Os procedimentos de atualização diferem dependendo de qual back-end de armazenamento é usado (Integrated Storage ou Consul). A diferença nas etapas a serem seguidas são destacadas nesses procedimentos.
 
 Personas: Este procedimento operacional padrão destina-se principalmente ao pessoal de operações.
 
@@ -762,9 +792,9 @@ As seguintes etapas de pré-requisito e conhecimento são necessários para atua
 *   O eVault  foi inicializado: este SOP pressupõe que você já inicializou o eVault , os detentores de chaves estão disponíveis com acesso às chaves de abertura de cada um, que você tem acesso a tokens com privilégios suficientes para ambos os clusters e os dados criptografados são armazenados no back-end de armazenamento.
 *   Guia de atualização do eVault : Esses SOPs pressupõem que você já revisou os Guias de atualização do eVault  junto com as notas de atualização específicas da versão do eVault  nessa área da documentação.
 
-Estas são instruções gerais de atualização do eVault para configurações não HA e HA. Certifique-se de ler também as notas de atualização específicas da versão.  
+Estas são instruções gerais de atualização do eVault para configurações não HA e HA. Certifique-se de ler também as notas de atualização específicas da versão.
 
-NOTA IMPORTANTE: Sempre faça backup de seus dados antes de atualizar. O eVault não oferece garantias de compatibilidade com versões anteriores para seu armazenamento de dados. A simples substituição do binário do eVault recém-instalado pela versão anterior não fará o downgrade do eVault de forma limpa, pois as atualizações podem realizar alterações na estrutura de dados subjacente que tornam os dados incompatíveis com um downgrade. Se precisar reverter para uma versão anterior do eVault , você também deve reverter seu armazenamento de dados. Os procedimentos definidos abaixo incluem etapas para fazer backup do armazenamento do eVault como etapa do procedimento de atualização.
+> NOTA IMPORTANTE: Sempre faça backup de seus dados antes de atualizar. O eVault não oferece garantias de compatibilidade com versões anteriores para seu armazenamento de dados. A simples substituição do binário do eVault recém-instalado pela versão anterior não fará o downgrade do eVault de forma limpa, pois as atualizações podem realizar alterações na estrutura de dados subjacente que tornam os dados incompatíveis com um downgrade. Se precisar reverter para uma versão anterior do eVault , você também deve reverter seu armazenamento de dados. Os procedimentos definidos abaixo incluem etapas para fazer backup do armazenamento do eVault como etapa do procedimento de atualização.
 
 As atualizações do eVault são projetadas de forma que grandes saltos (ou seja, 1.3.10 -> 1.7.x) sejam suportados. As notas de atualização para cada versão intermediária devem ser revisadas. As notas de atualização podem descrever etapas ou configurações adicionais para atualizar antes, durante ou após a atualização.
 
@@ -783,7 +813,7 @@ Instalações sem HA
 
 A atualização de instalações não HA do eVault é tão simples quanto substituir o binário do eVault pela nova versão e reiniciar o eVault . Quaisquer tarefas de atualização que possam ser executadas para você serão atendidas quando o eVault for aberto.
 
-Sempre use SIGINT ou SIGTERM para desligar corretamente o eVault .
+Sempre use SIGINT ou SIGTERM para desligar corretamente o eVault.
 
 Certifique-se de também ler e seguir todas as instruções nas notas de atualização específicas da versão.
 
@@ -807,10 +837,9 @@ Observe que o eVault não suporta atualizações com tempo de inatividade verdad
 
 Neste ponto, todos os nós de espera serão atualizados e estarão prontos para assumir o controle. A atualização não será concluída até que um dos nós de espera atualizados assuma o serviço ativo. Para fazer isso:
 
-1.  Desligue corretamente o nó restante (ativo);  
-    
+1.  Desligue corretamente o nó restante (ativo);
 
-Nota: É importante que você desligue o nó corretamente. Isso executará uma redução e liberará o bloqueio de HA, permitindo que um nó em espera assuma o controle com um atraso muito curto. Se você matar o eVault sem deixá-lo liberar o bloqueio, um nó de espera não poderá assumir o controle até que o período de tempo limite do bloqueio tenha expirado. Isso é específico do back-end, mas pode levar dez segundos ou mais.
+> Nota: É importante que você desligue o nó corretamente. Isso executará uma redução e liberará o bloqueio de HA, permitindo que um nó em espera assuma o controle com um atraso muito curto. Se você matar o eVault sem deixá-lo liberar o bloqueio, um nó de espera não poderá assumir o controle até que o período de tempo limite do bloqueio tenha expirado. Isso é específico do back-end, mas pode levar dez segundos ou mais.
 
 2.  Substitua o binário do eVault pela nova versão; certifique-se de que o mlock() recurso seja adicionado ao novo binário com setcap;
 3.  Iniciar o Node;
@@ -825,23 +854,21 @@ Arquitetura comportamental de componentes
 
 Todos os componentes da solução, se comunicam de forma criptografada garantindo a criptografia do tráfego de rede nas comunicações, utilizando os protocolos HTTPS e TLS. Recomendamos executar o eVault no Kubernetes com a mesma arquitetura geral usada em qualquer outro lugar. Existem alguns benefícios que o Kubernetes pode fornecer que facilitam a operação de um cluster do eVault e os documentamos abaixo.
 
-TLS de ponta a ponta: o eVault sempre deve ser usado com TLS na produção. Se balanceadores de carga intermediários ou proxies reversos forem usados ​​para o eVault frontal, eles não devem encerrar o TLS. Dessa forma, o tráfego é sempre criptografado em trânsito para o eVault e minimiza os riscos introduzidos pelas camadas intermediárias. Consulte a documentação oficial, por exemplo, sobre como configurar o eVault Helm para usar o TLS.  
+- TLS de ponta a ponta: o eVault sempre deve ser usado com TLS na produção. Se balanceadores de carga intermediários ou proxies reversos forem usados ​​para o eVault frontal, eles não devem encerrar o TLS. Dessa forma, o tráfego é sempre criptografado em trânsito para o eVault e minimiza os riscos introduzidos pelas camadas intermediárias. Consulte a documentação oficial, por exemplo, sobre como configurar o eVault Helm para usar o TLS.  
 [\[f\]](#cmnt6)  
-Locação única: o eVault deve ser o único processo principal em execução em uma máquina. Isso reduz o risco de que outro processo em execução na mesma máquina seja comprometido e possa interagir com o eVault. Isso pode ser feito usando o affinity configurável do eVault Helm. Consulte a documentação oficial, por exemplo, sobre como configurar o eVault Helm para usar regras de afinidade.  
-Ativar auditoria: o eVault oferece suporte a vários backends de auditoria. A ativação da auditoria fornece um histórico de todas as operações realizadas pelo eVault e fornece uma trilha forense em caso de uso indevido ou comprometimento. Os logs de auditoria criptografam com segurança todos os dados confidenciais, mas o acesso ainda deve ser restrito para evitar divulgações não intencionais. O eVault Helm inclui uma opção configurável auditStorage que provisiona um volume persistente para armazenar logs de auditoria. Consulte a documentação oficial para obter um exemplo de configuração do eVault Helm para usar a auditoria.  
-Atualizações imutáveis: o eVault depende de um back-end de armazenamento externo para persistência, e essa dissociação permite que os servidores que executam o eVault sejam gerenciados de forma imutável. Ao atualizar para novas versões, novos servidores com a versão atualizada do eVault são colocados online. Eles são anexados ao mesmo back-end de armazenamento compartilhado e não lacrados. Em seguida, os servidores antigos são destruídos. Isso reduz a necessidade de acesso remoto e orquestração de atualização, o que pode introduzir falhas de segurança. Consulte a seção de atualização para obter instruções sobre como atualizar o eVault no Kubernetes.  
-  
-Atualizar com frequência: o eVault é desenvolvido ativamente e atualizar com frequência é importante para incorporar correções de segurança e quaisquer alterações nas configurações padrão, como comprimentos de chave ou conjuntos de cifras. Inscreva-se na lista de discussão do eVault e no GitHub CHANGELOG para obter atualizações.  
-  
-Restringir o acesso ao armazenamento: o eVault criptografa todos os dados em repouso, independentemente de qual back-end de armazenamento é usado. Embora os dados sejam criptografados, um invasor com controle arbitrário pode causar corrupção ou perda de dados modificando ou excluindo chaves. O acesso ao back-end de armazenamento deve ser restrito apenas ao eVault para evitar acesso ou operações não autorizadas.
+- Locação única: o eVault deve ser o único processo principal em execução em uma máquina. Isso reduz o risco de que outro processo em execução na mesma máquina seja comprometido e possa interagir com o eVault. Isso pode ser feito usando o affinity configurável do eVault Helm. Consulte a documentação oficial, por exemplo, sobre como configurar o eVault Helm para usar regras de afinidade.  
+- Ativar auditoria: o eVault oferece suporte a vários backends de auditoria. A ativação da auditoria fornece um histórico de todas as operações realizadas pelo eVault e fornece uma trilha forense em caso de uso indevido ou comprometimento. Os logs de auditoria criptografam com segurança todos os dados confidenciais, mas o acesso ainda deve ser restrito para evitar divulgações não intencionais. O eVault Helm inclui uma opção configurável auditStorage que provisiona um volume persistente para armazenar logs de auditoria. Consulte a documentação oficial para obter um exemplo de configuração do eVault Helm para usar a auditoria.  
+- Atualizações imutáveis: o eVault depende de um back-end de armazenamento externo para persistência, e essa dissociação permite que os servidores que executam o eVault sejam gerenciados de forma imutável. Ao atualizar para novas versões, novos servidores com a versão atualizada do eVault são colocados online. Eles são anexados ao mesmo back-end de armazenamento compartilhado e não lacrados. Em seguida, os servidores antigos são destruídos. Isso reduz a necessidade de acesso remoto e orquestração de atualização, o que pode introduzir falhas de segurança. Consulte a seção de atualização para obter instruções sobre como atualizar o eVault no Kubernetes.
+- Atualizar com frequência: o eVault é desenvolvido ativamente e atualizar com frequência é importante para incorporar correções de segurança e quaisquer alterações nas configurações padrão, como comprimentos de chave ou conjuntos de cifras. Inscreva-se na lista de discussão do eVault e no GitHub CHANGELOG para obter atualizações.
+- Restringir o acesso ao armazenamento: o eVault criptografa todos os dados em repouso, independentemente de qual back-end de armazenamento é usado. Embora os dados sejam criptografados, um invasor com controle arbitrário pode causar corrupção ou perda de dados modificando ou excluindo chaves. O acesso ao back-end de armazenamento deve ser restrito apenas ao eVault para evitar acesso ou operações não autorizadas.
 
 Arquitetura recomendada
 -----------------------
 
 Garantindo a contingência da solução do ambiente DevOps através da implementação em alta disponibilidade, com a possibilidade de implementação de diversos modelos de implantação, a depender da necessidade e modelo de negócio das aplicações. Nessa arquitetura, o principal risco de disponibilidade está na camada de armazenamento. Com cinco nós no cluster Consul distribuídos entre três zonas de disponibilidade, essa arquitetura pode suportar a perda de dois nós de dentro do cluster ou a perda de uma zona de disponibilidade inteira e permanecer disponível. Como o eVault usa apenas um único nó ativo, o cluster do eVault precisa apenas de três membros do cluster para resistir à perda de dois nós ou de uma zona de disponibilidade inteira.[\[g\]](#cmnt7)[\[h\]](#cmnt8)![](images/image9.png)
 
-Se a implantação em três zonas de disponibilidade não for possível, a mesma arquitetura pode ser usada em duas ou uma zonas de disponibilidade, às custas de um risco de confiabilidade significativo em caso de interrupção da zona de disponibilidade.  
-  
+Se a implantação em três zonas de disponibilidade não for possível, a mesma arquitetura pode ser usada em duas ou uma zonas de disponibilidade, às custas de um risco de confiabilidade significativo em caso de interrupção da zona de disponibilidade.
+
 É importante usar um cluster Consul dedicado para armazenamento do eVault, separado de qualquer cluster Consul usado para outras finalidades, para minimizar a contenção de recursos na camada de armazenamento. Isso provavelmente exigirá o uso de portas não padrão para conectividade de rede Consul. Nesta arquitetura, as portas 7300 e 7301 foram usadas em vez dos padrões das portas 8300 e 8301.
 
 Requisitos de infraestrutura
@@ -849,9 +876,9 @@ Requisitos de infraestrutura
 
 Esta seção contém recomendações específicas de capacidade de hardware, requisitos de rede e considerações adicionais de infraestrutura. Como cada ambiente de hospedagem é diferente e o perfil de uso do eVault de cada cliente é diferente, essas recomendações devem servir apenas como um ponto de partida a partir do qual a equipe de operações de cada cliente pode observar e ajustar para atender às necessidades exclusivas de cada implantação.
 
-Aviso: Todas as especificações descritas neste documento são recomendações mínimas , sem reservas em relação a dimensionamento vertical, redundância ou outras necessidades de SRE e sem medição de seus volumes de usuários ou seus casos de uso em todos os cenários. Todos os requisitos de recursos são diretamente proporcionais às operações executadas pelo cluster do eVault, bem como à utilização dos usuários finais.  
+> Aviso: Todas as especificações descritas neste documento são recomendações mínimas , sem reservas em relação a dimensionamento vertical, redundância ou outras necessidades de SRE e sem medição de seus volumes de usuários ou seus casos de uso em todos os cenários. Todos os requisitos de recursos são diretamente proporcionais às operações executadas pelo cluster do eVault, bem como à utilização dos usuários finais.
 
-Observação: Para atender aos seus requisitos e maximizar a estabilidade de suas instâncias do eVault, é importante garantir que você esteja realizando testes de carga e continue monitorando o uso de recursos, bem como todas as matrizes relatadas da telemetria do eVault. Com monitoramento integrado de seus componentes, identificando problemas de performance ou disponibilidade, é possível o chaveamento automático para outro nó em caso de falha.[\[i\]](#cmnt9)
+> Observação: Para atender aos seus requisitos e maximizar a estabilidade de suas instâncias do eVault, é importante garantir que você esteja realizando testes de carga e continue monitorando o uso de recursos, bem como todas as matrizes relatadas da telemetria do eVault. Com monitoramento integrado de seus componentes, identificando problemas de performance ou disponibilidade, é possível o chaveamento automático para outro nó em caso de falha.[\[i\]](#cmnt9)
 
 ### Nós dedicados/kubelets
 
@@ -865,7 +892,9 @@ As tabelas de dimensionamento especificadas no momento da redação deste docume
 
 ### Sizing for Consul Nodes:
 
-### Sizing for eVault Nodes:![](images/image11.png)
+![](images/image11.png)
+
+### Sizing for eVault Nodes:
 
 ![](images/image14.png)
 
@@ -888,27 +917,31 @@ Filesystem Storage Backend: O Filesystem storage backend stores armazena os dado
 
 *   Sem alta disponibilidade: o back-end do sistema de arquivos não oferece suporte para alta disponibilidade.
 
+```jsonpath
 storage "file" {
 
   path = "/mnt/vault/data"
 
 }
+```
 
-Mesmo que os dados do eVault sejam criptografados "at Rest", você ainda deve tomar as medidas apropriadas para proteger o acesso ao sistema de arquivos.
+Mesmo que os dados do eVault sejam criptografados `at Rest`, você ainda deve tomar as medidas apropriadas para proteger o acesso ao sistema de arquivos.
 
 Integrated Storage (Raft) Backend: O Integrated Storage backend é usado para manter os dados do eVault. Ao contrário de outros backends de armazenamento, o Integrated Storage não opera a partir de uma única fonte de dados. Em vez disso, todos os nós em um cluster do eVault terão uma cópia replicada dos dados do eVault. Os dados são replicados em todos os nós por meio do Algoritmo de Consenso Raft.
 
 *   Alta disponibilidade: o back-end de armazenamento integrado suporta alta disponibilidade.
 
+```jsonpath
 storage "raft" {
 
   path = "/path/to/raft/data"
 
-  node\_id = "raft\_node\_1"
+  node_id = "raft_node_1"
 
 }
 
-cluster\_addr = "http://127.0.0.1:8201"
+cluster_addr = "http://127.0.0.1:8201"
+```
 
 ![](images/image3.png)
 
@@ -939,6 +972,7 @@ O eVault apresenta uma interface de usuário (interface da web) para interagir c
 
 A IU do eVault não é ativada por padrão. Para ativar a IU, defina a ui opção de configuração na configuração do servidor eVault. Os clientes do eVault não precisam definir essa opção, pois não servirá à IU.
 
+```yaml
 ui = true
 
 listener "tcp" {
@@ -946,9 +980,11 @@ listener "tcp" {
   # ...
 
 }
+```
 
 A interface do usuário é executada na mesma porta que o ouvinte do eVault. Como tal, você deve configurar pelo menos uma listener para acessar a IU.
 
+```yaml
 listener "tcp" {
 
   address = "10.0.1.35:8200"
@@ -960,16 +996,18 @@ listener "tcp" {
   # address = "127.0.0.1:8200"
 
 }
+```
 
 Nesse caso, a IU pode ser acessada no seguinte URL de qualquer máquina na sub-rede (desde que não haja firewalls de rede):
 
-https://10.0.1.35:8200/ui/
+> https://10.0.1.35:8200/ui/
 
 Também é acessível em qualquer entrada de DNS que resolva para esse endereço IP, como o endereço do serviço Consul (se estiver usando o Consul):
 
-https://evault.service.consul:8200/ui/
+> https://evault.service.consul:8200/ui/
 
-Nota sobre TLS: Ao usar TLS (recomendado), o certificado deve ser válido para todas as entradas DNS nas quais você acessa a IU do eVault e quaisquer endereços IP na SAN. Se você estiver executando o eVault com um certificado auto-assinado, todos os navegadores que acessam a IU do eVault precisarão ter a CA raiz instalada. Caso contrário, o navegador exibirá um aviso de que o site é "não confiável". É altamente recomendável que os navegadores clientes que acessam a interface do usuário do eVault instalem a raiz CA adequada para validação, a fim de reduzir a chance de um ataque MITM.
+
+> Nota sobre TLS: Ao usar TLS (recomendado), o certificado deve ser válido para todas as entradas DNS nas quais você acessa a IU do eVault e quaisquer endereços IP na SAN. Se você estiver executando o eVault com um certificado auto-assinado, todos os navegadores que acessam a IU do eVault precisarão ter a CA raiz instalada. Caso contrário, o navegador exibirá um aviso de que o site é "não confiável". É altamente recomendável que os navegadores clientes que acessam a interface do usuário do eVault instalem a raiz CA adequada para validação, a fim de reduzir a chance de um ataque MITM.
 
 Secrets Engines
 ===============
@@ -980,7 +1018,7 @@ Para obter a documentação da API para um mecanismo de segredos específico, es
 
 Kubernetes Secrets Engine (API)
 
-Observação: este mecanismo pode usar certificados X.509 externos como parte do TLS ou validação de assinatura. A verificação de assinaturas em relação a certificados X.509 que usam SHA-1 está obsoleta e não pode mais ser usada sem uma solução alternativa a partir do eVault 1.12.
+> Observação: este mecanismo pode usar certificados X.509 externos como parte do TLS ou validação de assinatura. A verificação de assinaturas em relação a certificados X.509 que usam SHA-1 está obsoleta e não pode mais ser usada sem uma solução alternativa a partir do eVault 1.12.
 
 O Kubernetes Secrets Engine for eVault gera tokens de conta de serviço Kubernetes e, opcionalmente, contas de serviço, vinculações de função e funções. Os tokens de conta de serviço criados têm um TTL configurável e todos os objetos criados são excluídos automaticamente quando a concessão do eVault expira.
 
@@ -991,7 +1029,7 @@ Para saber mais sobre contas de serviço no Kubernetes, visite a [conta de servi
 Kubernetes Auth Method
 ----------------------
 
-Observação: se você estiver atualizando para o Kubernetes v1.21+, certifique-se de que a opção de configuração disable\_iss\_validation esteja definida como true. Assumindo o caminho de montagem padrão, você pode verificar com evault read -field disable\_iss\_validation auth/kubernetes/config.
+> Observação: se você estiver atualizando para o Kubernetes v1.21+, certifique-se de que a opção de configuração disable_iss_validation esteja definida como true. Assumindo o caminho de montagem padrão, você pode verificar com evault read -field disable_iss_validation auth/kubernetes/config.
 
 O kubernetes método auth pode ser usado para autenticar com o eVault usando um token de conta de serviço do Kubernetes. Esse método de autenticação facilita a introdução de um token eVault em um Kubernetes Pod.
 
@@ -1010,74 +1048,88 @@ Os nomes das chaves sempre devem ser strings. Se você escrever valores não str
 
 Esse mecanismo de segredos respeita a distinção entre os recursos create e update dentro das políticas ACL.
 
-Observação: os nomes de caminho e chave não são ofuscados ou criptografados; apenas os valores definidos nas chaves são. Você não deve armazenar informações confidenciais como parte do caminho de um segredo.
+> Observação: os nomes de caminho e chave não são ofuscados ou criptografados; apenas os valores definidos nas chaves são. Você não deve armazenar informações confidenciais como parte do caminho de um segredo.
 
 #### Configurar
 
 Para habilitar um armazenamento kv versão 1:
 
-$ eVault secrets enable -version=1 kv
+```shell
+$ evault secrets enable -version=1 kv
+```
 
 #### Uso
 
-Depois que o mecanismo de segredos é configurado e um usuário/máquina possui um token do eVault com a permissão adequada, ele pode gerar credenciais. O kv mecanismo de segredos permite escrever chaves com valores arbitrários.
+Depois que o mecanismo de segredos é configurado e um `usuário/máquina` possui um token do eVault com a permissão adequada, ele pode gerar credenciais. O kv mecanismo de segredos permite escrever chaves com valores arbitrários.
 
 1.  Escrever dados arbitrários:
 
-$ eVault kv put kv/my-secret my-value=s3cr3t  
-  
+```shell
+$ evault kv put kv/my-secret my-value=s3cr3t
+
 Success! Data written to: kv/my-secret
+```
 
 2.  Leia dados arbitrários:
 
-$ eVault kv get kv/my-secret  
+```shell
+$ evault kv get kv/my-secret  
   
 Key                 Value
 
-\---                 -----
+---                 -----
 
 my-value            s3cr3t
+```
 
 3.  Liste as chaves:
 
-$ eVault kv list kv/
+```shell
+$ eVault kv list kv
 
-  
 Keys
 
-\----
+----
 
 my-secret
+```
 
 4.  Excluir uma chave:
 
-$ eVault kv delete kv/my-secret
+```shell
+$ evault kv delete kv/my-secret
 
-  
 Success! Data deleted (if it existed) at: kv/my-secret
+```
 
 #### TTLs
 
-Ao contrário de outros mecanismos de segredos, o mecanismo de segredos KV não impõe TTLs para expiração. Em vez disso, lease\_duration é uma dica de quantas vezes os consumidores devem verificar um novo valor.
+Ao contrário de outros mecanismos de segredos, o mecanismo de segredos KV não impõe TTLs para expiração. Em vez disso, lease_duration é uma dica de quantas vezes os consumidores devem verificar um novo valor.
 
 Se for fornecida uma chave de ttl, o mecanismo de segredos KV utilizará esse valor como a duração da concessão:
 
-$ eVault kv put kv/my-secret ttl=30m my-value=s3cr3t
+```shell
+$ evault kv put kv/my-secret ttl=30m my-value=s3cr3t
 
 Success! Data written to: kv/my-secret
+```
 
 Mesmo com um ttl conjunto, o mecanismo de segredos nunca remove os dados por conta própria. A ttl chave é meramente consultiva.
 
 Ao ler um valor com um ttl, a ttl chave e o intervalo de atualização refletirão o valor:
 
-$ eVault kv get kv/my-secret  
+```shell
+$ evault kv get kv/my-secret 
+ 
 Key                 Value
 
-\---                 -----
+---                 -----
 
 my-value            s3cr3t
 
 ttl                 30m
+```
+
 
 Auth Methods
 ============
@@ -1087,47 +1139,51 @@ Rest API
 
 O ponto de extremidade padrão é auth/kubernetes/login. Se esse método de autenticação foi ativado em um caminho diferente, use esse valor em vez de kubernetes.
 
-$ curl \\
+```shell
+$ curl \
 
-    --request POST \\
+    --request POST \
 
-    --data '{"jwt": "<your service account jwt>", "role": "demo"}' \\
+    --data '{"jwt": "<your service account jwt>", "role": "demo"}' \
 
     http://127.0.0.1:8200/v1/auth/kubernetes/login
+```
 
-A resposta conterá um token em auth.client\_token:
+A resposta conterá um token em `auth.client_token`:
 
+```json
 {
 
   "auth": {
 
-    "client\_token": "38fe9691-e623-7238-f618-c94d4e7bc674",
+    "client_token": "38fe9691-e623-7238-f618-c94d4e7bc674",
 
     "accessor": "78e87a38-84ed-2692-538f-ca8b9f400ab3",
 
-    "policies": \["default"\],
+    "policies": ["default"\],
 
     "metadata": {
 
       "role": "demo",
 
-      "service\_account\_name": "myapp",
+      "service_account_name": "myapp",
 
-      "service\_account\_namespace": "default",
+      "service_account_namespace": "default",
 
-      "service\_account\_secret\_name": "myapp-token-pd21c",
+      "service_account_secret_name": "myapp-token-pd21c",
 
-      "service\_account\_uid": "aa9aa8ff-98d0-11e7-9bb7-0800276d99bf"
+      "service_account_uid": "aa9aa8ff-98d0-11e7-9bb7-0800276d99bf"
 
     },
 
-    "lease\_duration": 2764800,
+    "lease_duration": 2764800,
 
     "renewable": true
 
   }
 
 }
+```
 
 Múltiplo fator de autenticação (MFA)
 ------------------------------------
@@ -1148,7 +1204,7 @@ Todas as rotas de API são prefixadas com /v1/.
 
 Esta documentação é apenas para a API v1, que é atualmente a única versão.
 
-Compatibilidade com versões anteriores 
+Compatibilidade com versões anteriores
 ---------------------------------------
 
 Na versão atual, o eVault ainda não promete compatibilidade com versões anteriores, mesmo com o prefixo v1. Removeremos este aviso quando esta política for alterada. Neste momento, a API principal (ou seja, sys/routes) muda com pouca frequência, mas vários mecanismos de segredos/métodos de autenticação/etc. às vezes têm pequenas alterações para acomodar novos recursos à medida que são desenvolvidos.
@@ -1181,117 +1237,138 @@ Normalmente, os dados de solicitação, corpo e dados de resposta de e para o eV
 
 A demonstração abaixo usa o KVv1 mecanismo de segredos, que é um armazenamento de chave/valor simples. Para KVv1, a leitura de um segredo usando a API HTTP é feita emitindo um GET:
 
+```shell
 /v1/secret/foo
+```
 
 Isso mapeia secret/foo onde foo está a chave na secret/mount, que é montada por padrão em uma nova instalação do eVault e é do tipo kv.
 
 Aqui está um exemplo de leitura de um segredo usando cURL:
 
-curl \\
+```shell
+curl \
 
-    -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \\
+    -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
 
-    -X GET \\
+    -X GET \
 
     http://127.0.0.1:8200/v1/secret/foo
+```
 
-Alguns endpoints consomem chamadas com GET parâmetros de string de consulta, mas apenas se esses parâmetros não forem confidenciais, especialmente porque alguns balanceadores de carga poderão registrá-los. A maioria dos endpoints que aceitam POST parâmetros de string de consulta esperam esses parâmetros no corpo da solicitação.
+Alguns endpoints consomem chamadas com `GET` parâmetros de string de consulta, mas apenas se esses parâmetros não forem confidenciais, especialmente porque alguns balanceadores de carga poderão registrá-los. A maioria dos endpoints que aceitam `POST` parâmetros de string de consulta esperam esses parâmetros no corpo da solicitação.
 
-Você também pode listar segredos. Para fazer isso, emita um GET com o parâmetro list=true de string de consulta ou use o LIST verbo HTTP. Para o kv mecanismo de segredos, a listagem é permitida apenas em diretórios, que retornam as chaves no caminho solicitado:
+Você também pode listar segredos. Para fazer isso, emita um `GET` com o parâmetro `list=true` de string de consulta ou use o `LIST` verbo HTTP. Para o kv mecanismo de segredos, a listagem é permitida apenas em diretórios, que retornam as chaves no caminho solicitado:
 
-curl \\
+```shell
+curl \
 
-    -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \\
+    -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
 
-    -X LIST \\
+    -X LIST \
 
     http://127.0.0.1:8200/v1/secret/
+```
 
-A documentação da API usa LIST como o verbo HTTP, mas você ainda pode usar GET com a ?list=truestring de consulta. Para fazer uma API com dados específicos no corpo da solicitação, emita um POST:
+A documentação da API usa `LIST` como o verbo `HTTP`, mas você ainda pode usar `GET` com a `?list=true` string de consulta. Para fazer uma API com dados específicos no corpo da solicitação, emita um POST:
 
+```shell
 /v1/secret/foo
+```
 
 com um corpo JSON como:
 
+```json
 {
 
   "value": "bar"
 
 }
+```
 
 Aqui está um exemplo de como escrever um segredo usando cURL:
 
-curl \\
+```shell
+curl \
 
-   -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \\
+   -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
 
-   -H "Content-Type: application/json" \\
+   -H "Content-Type: application/json" \
 
-   -X POST \\
+   -X POST \
 
-   -d '{"data":{"value":"bar"}}' \\
+   -d '{"data":{"value":"bar"}}' \
 
    http://127.0.0.1:8200/v1/secret/baz
+```
 
-Atualmente, o eVault considera PUT e POST como sinônimos. Em vez de confiar nas intenções declaradas de um cliente, os mecanismos do eVault podem implementar uma verificação de existência para descobrir se uma operação é realmente uma operação de criação ou atualização com base nos dados já armazenados no eVault. Isso torna o gerenciamento de permissões via ACLs mais flexível.
+Atualmente, o eVault considera `PUT` e `POST`como sinônimos. Em vez de confiar nas intenções declaradas de um cliente, os mecanismos do eVault podem implementar uma verificação de existência para descobrir se uma operação é realmente uma operação de criação ou atualização com base nos dados já armazenados no eVault. Isso torna o gerenciamento de permissões via ACLs mais flexível.
 
-Um exemplo de KVv2 para o caminho do mecanismo secret requer que o URI seja anexado data/ antes do nome secreto (baz), como:
+Um exemplo de KVv2 para o caminho do mecanismo secret requer que o URI seja anexado `data/` antes do nome secreto (baz), como:
 
-curl \\
+```shell
+curl \
 
-   -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \\
+   -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
 
-   -H "Content-Type: application/json" \\
+   -H "Content-Type: application/json" \
 
-   -X POST \\
+   -X POST \
 
-   -d '{"data":{"value":"bar"}}' \\
+   -d '{"data":{"value":"bar"}}' \
 
    http://127.0.0.1:8200/v1/secret/data/baz
+```
 
 Para obter mais exemplos, consulte o cliente da API do eVault.
 
 O X-Vault-Request Header
 ------------------------
 
-As solicitações enviadas a um eVault Agent configurado para usar a require\_request\_header devem incluir a X-Vault-Request como entrada do cabeçalho, por exemplo:
+As solicitações enviadas a um eVault Agent configurado para usar a `require_request_header` devem incluir a `X-Vault-Request` como entrada do cabeçalho, por exemplo:
 
-curl \\
+```shell
+curl \
 
-   -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \\
+   -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
 
-   -H "X-Vault-Request: true" \\
+   -H "X-Vault-Request: true" \
 
-   -H "Content-Type: application/json" \\
+   -H "Content-Type: application/json" \
 
-   -X POST \\
+   -X POST \
 
-   -d '{"value":"bar"}' \\
+   -d '{"value":"bar"}' \
 
    http://127.0.0.1:8200/v1/secret/baz
+```
 
 A CLI do eVault sempre adiciona esse cabeçalho a todas as solicitações, independentemente de a solicitação estar sendo enviada para um agente do eVault ou diretamente para um servidor do eVault. Além disso, o eVault SDK sempre adiciona esse cabeçalho a cada solicitação.
 
 Help
 ----
 
-Para recuperar a ajuda de qualquer API no eVault, incluindo mecanismos montados, métodos de autenticação etc., anexe ?help=1 a qualquer URL. Se você tiver permissão válida para acessar o caminho, o texto de ajuda será retornado como um bloco formatado em markdown no help atributo da resposta.
+Para recuperar a ajuda de qualquer API no eVault, incluindo mecanismos montados, métodos de autenticação etc., anexe `?help=1` a qualquer URL. Se você tiver permissão válida para acessar o caminho, o texto de ajuda será retornado como um bloco formatado em markdown no help atributo da resposta.
 
-Além disso, com a geração do OpenAPI no eVault, você receberá um pequeno documento do OpenAPI no openapi atributo. Este documento é relevante para o caminho que você está procurando e quaisquer caminhos abaixo dele - observe também que os caminhos no documento OpenAPI são relativos ao caminho inicial consultado.
+Além disso, com a geração do OpenAPI no eVault, você receberá um pequeno documento do OpenAPI no openapi atributo. Este documento é relevante para o caminho que você está procurando e quaisquer caminhos abaixo dele.
+
+> observe também que os caminhos no documento OpenAPI são relativos ao caminho inicial consultado.
 
 Solicitação de exemplo:
 
-curl \\
+```shell
+curl \
 
-   -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \\
+   -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
 
    http://127.0.0.1:8200/v1/secret?help=1
+```
 
 Exemplo de resposta:
 
+```json
 {
 
-  "help": "## DESCRIPTION\\n\\nThis backend provides a versioned key-value store. The kv backend reads and\\nwrites arbitrary secrets to the storage backend. The secrets are\\nencrypted/decrypted by eVault: they are never stored unencrypted in the backend\\nand the backend never has an opportunity to see the unencrypted value. Each key\\ncan have a configured number of versions, and versions can be retrieved based on\\ntheir version numbers.\\n\\n## PATHS\\n\\nThe following paths are supported by this backend. To view help for\\nany of the paths below, use the help command with any route matching\\nthe path pattern. Note that depending on the policy of your auth token,\\nyou may or may not be able to access certain paths.\\n\\n    ^.\*$\\n\\n\\n    ^config$\\n        Configures settings for the KV store\\n\\n    ^data/(?P<path>.\*)$\\n        Write, Read, and Delete data in the Key-Value Store.\\n\\n    ^delete/(?P<path>.\*)$\\n        Marks one or more versions as deleted in the KV store.\\n\\n    ^destroy/(?P<path>.\*)$\\n        Permanently removes one or more versions in the KV store\\n\\n    ^metadata/(?P<path>.\*)$\\n        Configures settings for the KV store\\n\\n    ^undelete/(?P<path>.\*)$\\n        Undeletes one or more versions from the KV store.",
+  "help": "## DESCRIPTION\n\nThis backend provides a versioned key-value store. The kv backend reads and\nwrites arbitrary secrets to the storage backend. The secrets are\nencrypted/decrypted by eVault: they are never stored unencrypted in the backend\nand the backend never has an opportunity to see the unencrypted value. Each key\ncan have a configured number of versions, and versions can be retrieved based on\ntheir version numbers.\n\n## PATHS\n\nThe following paths are supported by this backend. To view help for\nany of the paths below, use the help command with any route matching\nthe path pattern. Note that depending on the policy of your auth token,\nyou may or may not be able to access certain paths.\n\n^.*$\n\n\n^config$\nConfigures settings for the KV store\n\n^data/(?P<path>.*)$\n Write, Read, and Delete data in the Key-Value Store.\n\n    ^delete/(?P<path>.*)$\n Marks one or more versions as deleted in the KV store.\n\n    ^destroy/(?P<path>.*)$\n        Permanently removes one or more versions in the KV store\n\n    ^metadata/(?P<path>.*)$\n        Configures settings for the KV store\n\n    ^undelete/(?P<path>.*)$\\n        Undeletes one or more versions from the KV store.",
 
   "openapi": {
 
@@ -1301,7 +1378,7 @@ Exemplo de resposta:
 
       "title": "SlashiCorp eVault API",
 
-      "description": "HTTP API that gives you full access to eVault. All API routes are prefixed with \`/v1/\`.",
+      "description": "HTTP API that gives you full access to eVault. All API routes are prefixed with `/v1/`.",
 
       "version": "1.0.0",
 
@@ -1329,11 +1406,11 @@ Exemplo de resposta:
 
           "summary": "Read the backend level settings.",
 
-          "tags": \[
+          "tags": [
 
             "secrets"
 
-          \],
+          ],
 
           "responses": {
 
@@ -1347,95 +1424,105 @@ Exemplo de resposta:
 
         },
 
-     ...\[output truncated\]...
+     ...[output truncated]...
 
      }
 
   }
 
 }
+```
 
 Resposta de erro
 ----------------
 
-Uma estrutura JSON comum sempre é retornada para retornar erros:
+Uma estrutura `JSON` comum sempre é retornada para retornar erros:
 
+```json
 {
 
-  "errors": \[
+  "errors": [
 
     "message",
 
     "another message"
 
-  \]
+  ]
 
 }
+```
 
-Essa estrutura será retornada para qualquer status HTTP maior ou igual a 400.
+Essa estrutura será retornada para qualquer status HTTP maior ou igual a 400.
 
 Códigos de status HTTP
 ----------------------
 
 Os seguintes códigos de status HTTP são usados em toda a API. O eVault tenta aderir a eles sempre que possível, mas caso isso não aconteça, sinta-se à vontade para relatar um bug para nossa atenção!
 
-Nota: As candidaturas devem estar preparadas para aceitar ambos 200 e 204 como sucesso. 204 é simplesmente uma indicação de que não há nenhum corpo de resposta para analisar, mas os pontos de extremidade da API que indicam que retornam um 204 podem retornar um 200 se forem gerados avisos durante a operação.
+> Nota: As candidaturas devem estar preparadas para aceitar ambos 200 e 204 como sucesso. 204 é simplesmente uma indicação de que não há nenhum corpo de resposta para analisar, mas os pontos de extremidade da API que indicam que retornam um 204 podem retornar um 200 se forem gerados avisos durante a operação.
 
-200- Sucesso com dados.
+```yaml
+200: Sucesso com dados.
 
-204- Sucesso, nenhum dado retornado.
+204: Sucesso, nenhum dado retornado.
 
-400- Solicitação inválida, dados ausentes ou inválidos.
+400: Solicitação inválida, dados ausentes ou inválidos.
 
-403-Proibido, seus detalhes de autenticação estão incorretos, você não tem acesso a esse recurso ou - se o CORS estiver ativado - você fez uma solicitação de origem cruzada de uma origem que não tem permissão para fazer tais solicitações.
+403: Proibido, seus detalhes de autenticação estão incorretos, você não tem acesso a esse recurso ou - se o CORS estiver ativado - você fez uma solicitação de origem cruzada de uma origem que não tem permissão para fazer tais solicitações.
 
-404-Caminho inválido. Isso pode significar que o caminho realmente não existe ou que você não tem permissão para visualizar um caminho específico. Usamos 404 em alguns casos para evitar vazamento de estado.
+404: Caminho inválido. Isso pode significar que o caminho realmente não existe ou que você não tem permissão para visualizar um caminho específico. Usamos 404 em alguns casos para evitar vazamento de estado.
 
-405-Operação não suportada. Você tentou usar um método inadequado para o caminho da solicitação, por exemplo, um POST em um terminal que aceita apenas GETs.
+405: Operação não suportada. Você tentou usar um método inadequado para o caminho da solicitação, por exemplo, um POST em um terminal que aceita apenas GETs.
 
-412-A pré-condição falhou. Retornado no Enterprise quando uma solicitação ainda não pode ser processada devido a alguns dados eventualmente consistentes ausentes. Deve ser repetido, talvez com um pequeno recuo.
+412: A pré-condição falhou. Retornado no Enterprise quando uma solicitação ainda não pode ser processada devido a alguns dados eventualmente consistentes ausentes. Deve ser repetido, talvez com um pequeno recuo.
 
-429-Código de retorno padrão para status de funcionamento dos nós de espera. Isso provavelmente mudará no futuro.
+429: Código de retorno padrão para status de funcionamento dos nós de espera. Isso provavelmente mudará no futuro.
 
-473-Código de retorno padrão para o status de integridade dos nós de espera de desempenho.
+473: Código de retorno padrão para o status de integridade dos nós de espera de desempenho.
 
-500-Erro do Servidor Interno. Ocorreu um erro interno, tente novamente mais tarde. Se o erro persistir, reporte um bug.
+500: Erro do Servidor Interno. Ocorreu um erro interno, tente novamente mais tarde. Se o erro persistir, reporte um bug.
 
-502-Uma solicitação ao eVault exigia que o eVault fizesse uma solicitação a um terceiro; o terceiro respondeu com algum tipo de erro.
+502: Uma solicitação ao eVault exigia que o eVault fizesse uma solicitação a um terceiro; o terceiro respondeu com algum tipo de erro.
 
-503-O eVault está desativado para manutenção ou está lacrado. Tente mais tarde.
+503: O eVault está desativado para manutenção ou está lacrado. Tente mais tarde.
+```
 
 Limites
 -------
 
-Um tamanho máximo de solicitação de 32MB é imposto para evitar um ataque de negação de serviço com solicitações arbitrariamente grandes; isso pode ser ajustado por listener bloco no arquivo de configuração do servidor do eVault.
+Um tamanho máximo de solicitação de 32MB é imposto para evitar um ataque de negação de serviço com solicitações arbitrariamente grandes; isso pode ser ajustado por listener bloco no arquivo de configuração do servidor do eVault.
 
 System Backend
 ==============
 
-O back-end do sistema é um back-end padrão no eVault montado no ponto de extremidade /sys. Este terminal não pode ser desativado ou movido e é usado para configurar o eVault e interagir com muitos dos recursos internos do eVault.
+O back-end do sistema é um back-end padrão no eVault montado no ponto de extremidade `/sys`. Este terminal não pode ser desativado ou movido e é usado para configurar o eVault e interagir com muitos dos recursos internos do eVault.
 
 /sys/audit
 ----------
 
-O /sys/audit terminal é usado para listar, habilitar e desabilitar dispositivos de auditoria. Os dispositivos de auditoria devem ser ativados antes do uso e mais de um dispositivo pode ser ativado por vez.
+O `/sys/audit` terminal é usado para listar, habilitar e desabilitar dispositivos de auditoria. Os dispositivos de auditoria devem ser ativados antes do uso e mais de um dispositivo pode ser ativado por vez.
 
 ### Listar dispositivos de auditoria ativados
 
 Este terminal lista apenas os dispositivos de auditoria habilitados (ele não lista todos os dispositivos de auditoria disponíveis).
 
-*   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.![](images/image15.png)
+*   sudo required – esse ponto de extremidade requer `sudo` recursos além de quaisquer recursos específicos do caminho.
+ 
+![](images/image15.png)
 
 ### Sample Request
 
-curl \\
+```shell
+curl \
 
-    --header "X-Vault-Token: ..." \\
+    --header "X-Vault-Token: ..." \
 
     http://127.0.0.1:8200/v1/sys/audit
+```
 
 ### Sample Response
 
+```json
 {
 
   "file": {
@@ -1446,89 +1533,96 @@ curl \\
 
     "options": {
 
-      "file\_path": "/var/log/vault.log"
+      "file_path": "/var/log/vault.log"
 
     }
 
   }
 
 }
+```
 
 ### Enable Audit Device
 
 Este endpoint habilita um novo dispositivo de auditoria no caminho fornecido. O caminho pode ser um nome de palavra única ou um caminho aninhado mais complexo.
 
-*   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.
+*   sudo required – esse ponto de extremidade requer sudo` recursos além de quaisquer recursos específicos do caminho.
 
-### Parameters![](images/image1.png)
+### Parameters
 
-*   path (string: <required>) – Especifica o caminho no qual ativar o dispositivo de auditoria. Isso faz parte do URL da solicitação.
-*   description (string: "") – Especifica uma descrição amigável do dispositivo de auditoria.
-*   options (map<string|string>: nil) – Especifica opções de configuração para passar para o próprio dispositivo de auditoria. Isso depende do tipo de dispositivo de auditoria.
-*   type (string: <required>) – Especifica o tipo do dispositivo de auditoria.
+![](images/image1.png)
 
-Além disso, as seguintes opções são permitidas no código-fonte aberto do eVault, mas a funcionalidade relevante é suportada apenas no eVault Enterprise:
-
-*   local (bool: false)  – Especifica se o dispositivo de auditoria é local apenas no cluster. Os dispositivos de auditoria local não são replicados nem (se forem secundários) removidos por replicação.
+*   path(string: <required>) – Especifica o caminho no qual ativar o dispositivo de auditoria. Isso faz parte do URL da solicitação.
+*   description(string: "") – Especifica uma descrição amigável do dispositivo de auditoria.
+*   options(map<string|string>: nil)– Especifica opções de configuração para passar para o próprio dispositivo de auditoria. Isso depende do tipo de dispositivo de auditoria.
+*   type(string: <required>)– Especifica o tipo do dispositivo de auditoria.
 
 ### Sample Payload
 
+```json
 {
 
   "type": "file",
 
   "options": {
 
-    "file\_path": "/var/log/vault/log"
+    "file_path": "/var/log/vault/log"
 
   }
 
 }
+```
 
 ### Sample Request
 
-curl \\
+```shell
+curl \
 
-    --header "X-Vault-Token: ..." \\
+    --header "X-Vault-Token: ..." \
 
-    --request POST \\
+    --request POST \
 
-    --data @payload.json \\
+    --data @payload.json \
 
     http://127.0.0.1:8200/v1/sys/audit/example-audit
+```
 
 ### Disable Audit Device
 
 Este endpoint desativa o dispositivo de auditoria no caminho fornecido.
 
-*   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.
+*   sudo required – esse ponto de extremidade requer `sudo` recursos além de quaisquer recursos específicos do caminho.
 
-### ![](images/image16.png)
+![](images/image16.png)
 
 ### Parameters
 
-*   path (string: <required>) – Especifica o caminho do dispositivo de auditoria a ser excluído. Isso faz parte do URL da solicitação.
+*   path(string: <required>) – Especifica o caminho do dispositivo de auditoria a ser excluído. Isso faz parte do URL da solicitação.
 
 ### Sample Request
 
-curl \\
+```shell
+curl \
 
-    --header "X-Vault-Token: ..." \\
+    --header "X-Vault-Token: ..." \
 
-    --request DELETE \\
+    --request DELETE \
 
     http://127.0.0.1:8200/v1/sys/audit/example-audit
+```
 
 /sys/audit-hash
 ---------------
 
-O /sys/audit-hash endpoint é usado para calcular o hash dos dados usados ​​pela função hash e salt de um dispositivo de auditoria. Isso pode ser usado para pesquisar logs de auditoria para um valor de hash quando o valor original é conhecido.
+O `/sys/audit-hash` endpoint é usado para calcular o hash dos dados usados pela função hash e salt de um dispositivo de auditoria. Isso pode ser usado para pesquisar logs de auditoria para um valor de hash quando o valor original é conhecido.
 
 ### Calculate Hash
 
-Este ponto de extremidade faz o hash dos dados de entrada fornecidos com a função de hash e salt do dispositivo de auditoria especificado. Esse endpoint pode ser usado para descobrir se uma determinada string de texto simples (o input parâmetro) aparece no log de auditoria de forma ofuscada.
+Este ponto de extremidade faz o hash dos dados de entrada fornecidos com a função de hash e salt do dispositivo de auditoria especificado. Esse endpoint pode ser usado para descobrir se uma determinada string de texto simples (o input parâmetro) aparece no log de auditoria de forma ofuscada.
 
-O log de auditoria registra solicitações e respostas. Como a API do eVault é baseada em JSON, todos os dados binários retornados de uma chamada de API (como um certificado no formato DER) são codificados em base64 pelo servidor do eVault na resposta. Como resultado, essas informações também devem ser codificadas em base64 para fornecer ao input parâmetro.![](images/image8.png)
+O log de auditoria registra solicitações e respostas. Como a API do eVault é baseada em JSON, todos os dados binários retornados de uma chamada de API (como um certificado no formato DER) são codificados em base64 pelo servidor do eVault na resposta. Como resultado, essas informações também devem ser codificadas em base64 para fornecer ao input parâmetro.
+
+![](images/image8.png)
 
 ### Parameters
 
@@ -1537,35 +1631,41 @@ O log de auditoria registra solicitações e respostas. Como a API do eVault é 
 
 ### Sample Payload
 
+```json
 {
 
   "input": "my-secret-vault"
 
 }
+```
 
 ### Sample Request
 
-curl \\
+```shell
+curl \
 
-    --header "X-Vault-Token: ..." \\
+    --header "X-Vault-Token: ..." \
 
-    --request POST \\
+    --request POST \
 
-    --data @payload.json \\
+    --data @payload.json \
 
     http://127.0.0.1:8200/v1/sys/audit-hash/example-audit
+```
 
 ### Sample Response
 
+```json
 {
 
   "hash": "hmac-sha256:08ba35..."
 
 }
+```
 
-/sys/auth
+### /sys/auth
 
-O /sys/auth endpoint é usado para listar, criar, atualizar e excluir métodos de autenticação. Os métodos de autenticação convertem as informações fornecidas pelo usuário ou pela máquina em um token que pode ser usado para todas as solicitações futuras.
+O `/sys/auth` endpoint é usado para listar, criar, atualizar e excluir métodos de autenticação. Os métodos de autenticação convertem as informações fornecidas pelo usuário ou pela máquina em um token que pode ser usado para todas as solicitações futuras.
 
 List Auth Methods
 
@@ -1575,21 +1675,24 @@ Este endpoint lista todos os métodos de autenticação ativados.
 
 ### Sample Request
 
-curl \\
+```shell
+curl \
 
-    --header "X-Vault-Token: ..." \\
+    --header "X-Vault-Token: ..." \
 
     http://127.0.0.1:8200/v1/sys/auth
+```
 
 ### Sample Response
 
+```json
 {
 
-  "request\_id": "9bc0fab8-d65c-3961-afe6-d05f50c5fd22",
+  "request_id": "9bc0fab8-d65c-3961-afe6-d05f50c5fd22",
 
-  "lease\_id": "",
+  "lease_id": "",
 
-  "lease\_duration": 0,
+  "lease_duration": 0,
 
   "renewable": false,
 
@@ -1597,37 +1700,37 @@ curl \\
 
     "github/": {
 
-      "accessor": "auth\_github\_badd7fd0",
+      "accessor": "auth_github_badd7fd0",
 
       "config": {
 
-        "default\_lease\_ttl": 0,
+        "default_lease_ttl": 0,
 
-        "force\_no\_cache": false,
+        "force_no_cache": false,
 
-        "max\_lease\_ttl": 0,
+        "max_lease_ttl": 0,
 
-        "token\_type": "default-service"
+        "token_type": "default-service"
 
       },
 
-      "deprecation\_status": "supported",
+      "deprecation_status": "supported",
 
       "description": "",
 
-      "external\_entropy\_access": false,
+      "external_entropy_access": false,
 
       "local": false,
 
       "options": null,
 
-      "plugin\_version": "",
+      "plugin_version": "",
 
-      "running\_plugin\_version": "v1.12.0+builtin.vault",
+      "running_plugin_version": "v1.12.0+builtin.vault",
 
-      "running\_sha256": "",
+      "running_sha256": "",
 
-      "seal\_wrap": false,
+      "seal_wrap": false,
 
       "type": "github",
 
@@ -1637,35 +1740,35 @@ curl \\
 
     "token/": {
 
-      "accessor": "auth\_token\_bd90f507",
+      "accessor": "auth_token_bd90f507",
 
       "config": {
 
-        "default\_lease\_ttl": 0,
+        "default_lease_ttl": 0,
 
-        "force\_no\_cache": false,
+        "force_no_cache": false,
 
-        "max\_lease\_ttl": 0,
+        "max_lease_ttl": 0,
 
-        "token\_type": "default-service"
+        "token_type": "default-service"
 
       },
 
       "description": "token based credentials",
 
-      "external\_entropy\_access": false,
+      "external_entropy_access": false,
 
       "local": false,
 
       "options": null,
 
-      "plugin\_version": "",
+      "plugin_version": "",
 
-      "running\_plugin\_version": "v1.12.0+builtin.vault",
+      "running_plugin_version": "v1.12.0+builtin.vault",
 
-      "running\_sha256": "",
+      "running_sha256": "",
 
-      "seal\_wrap": false,
+      "seal_wrap": false,
 
       "type": "token",
 
@@ -1678,38 +1781,40 @@ curl \\
   "warnings": null
 
 }
+```
 
 Enable Auth Method
 ------------------
 
-Este endpoint habilita um novo método de autenticação. Após a ativação, o método de autenticação pode ser acessado e configurado por meio do caminho de autenticação especificado como parte da URL. Este caminho de autenticação será aninhado sob o auth prefixo.
+Este endpoint habilita um novo método de autenticação. Após a ativação, o método de autenticação pode ser acessado e configurado por meio do caminho de autenticação especificado como parte da URL. Este caminho de autenticação será aninhado sob o `auth` prefixo.
 
-Por exemplo, ativar o método de autenticação "foo" o tornará acessível em /auth/foo.
+Por exemplo, ativar o método de autenticação `foo` o tornará acessível em `/auth/foo`.
 
-*   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.
+*   sudo required – esse ponto de extremidade requer `sudo` recursos além de quaisquer recursos específicos do caminho.
 
 ![](images/image22.png)
 
 ### Parameters
 
-*   path (string: <required>)– Especifica o caminho no qual habilitar o método de autenticação. Isso faz parte do URL da solicitação.  
+*   path(string: <required>)– Especifica o caminho no qual habilitar o método de autenticação. Isso faz parte do URL da solicitação.  
     ![](images/image2.png)
 *   description (string: "")– Especifica uma descrição amigável do método de autenticação.
 *   type (string: <required>)– Especifica o nome do tipo de método de autenticação, como "github" ou "token".
 *   config (map<string|string>: nil)– Especifica opções de configuração para este método de autenticação. Estes são os valores possíveis:
 
-*   default\_lease\_ttl (string: "")\- A duração da concessão padrão, especificada como uma duração de string como "5s" ou "30m".
-*   [max\_lease\_ttl](https://www.google.com/url?q=https://developer.hashicorp.com/vault/api-docs/system/auth%23max_lease_ttl&sa=D&source=editors&ust=1671633434776074&usg=AOvVaw0agmqbG94yFyGjuean2YBr) (string: "")\- A duração máxima da concessão, especificada como uma duração de string como "5s" ou "30m".
-*   audit\_non\_hmac\_request\_keys (array: \[\])\- Lista de chaves que não serão HMAC'd por dispositivos de auditoria no objeto de dados de solicitação.
-*   audit\_non\_hmac\_response\_keys (array: \[\])\- Lista de chaves que não serão HMAC'd por dispositivos de auditoria no objeto de dados de resposta.
-*   listing\_visibility (string: "")\- Especifica se deve mostrar esta montagem no terminal de listagem específico da interface do usuário. Os valores válidos são "unauth"ou "hidden", sendo o padrão "" equivalente a "hidden".
-*   passthrough\_request\_headers (array: \[\])\- Lista de cabeçalhos para a lista de permissões e passar da solicitação para o plug-in.
-*   allowed\_response\_headers (array: \[\])\- Lista de cabeçalhos para lista branca, permitindo que um plugin os inclua na resposta.  
-    
-*   plugin\_version (string: "")– Especifica a versão semântica do plug-in a ser usado, por exemplo, "v1.0.0". Se não for especificado, o servidor selecionará qualquer plug-in não versionado correspondente que possa ter sido registrado, o plug-in com versão mais recente registrado ou um plug-in integrado nessa ordem de precedência.
+*   default_lease_ttl (string: "")\- A duração da concessão padrão, especificada como uma duração de string como "5s" ou "30m".
+*   [max_lease_ttl](https://www.google.com/url?q=https://developer.hashicorp.com/vault/api-docs/system/auth%23max_lease_ttl&sa=D&source=editors&ust=1671633434776074&usg=AOvVaw0agmqbG94yFyGjuean2YBr) (string: "")\- A duração máxima da concessão, especificada como uma duração de string como "5s" ou "30m".
+*   audit_non_hmac_request_keys (array: \[\])\- Lista de chaves que não serão HMAC'd por dispositivos de auditoria no objeto de dados de solicitação.
+*   audit_non_hmac_response_keys (array: \[\])\- Lista de chaves que não serão HMAC'd por dispositivos de auditoria no objeto de dados de resposta.
+*   listing_visibility (string: "")\- Especifica se deve mostrar esta montagem no terminal de listagem específico da interface do usuário. Os valores válidos são "unauth"ou "hidden", sendo o padrão "" equivalente a "hidden".
+*   passthrough_request_headers (array: \[\])\- Lista de cabeçalhos para a lista de permissões e passar da solicitação para o plug-in.
+*   allowed_response_headers (array: \[\])\- Lista de cabeçalhos para lista branca, permitindo que um plugin os inclua na resposta.
+
+*   plugin_version (string: "")– Especifica a versão semântica do plug-in a ser usado, por exemplo, "v1.0.0". Se não for especificado, o servidor selecionará qualquer plug-in não versionado correspondente que possa ter sido registrado, o plug-in com versão mais recente registrado ou um plug-in integrado nessa ordem de precedência.
 
 ### Sample Payload
 
+```json
 {
 
   "type": "github",
@@ -1717,18 +1822,21 @@ Por exemplo, ativar o método de autenticação "foo" o tornará acessível em 
   "description": "Login with GitHub"
 
 }
+```
 
 ### Sample Request
 
-curl \\
+```shell
+curl \
 
-    --header "X-Vault-Token: ..." \\
+    --header "X-Vault-Token: ..." \
 
-    --request POST \\
+    --request POST \
 
-    --data @payload.json \\
+    --data @payload.json \
 
     http://127.0.0.1:8200/v1/sys/auth/my-auth
+```
 
 Read Auth Method configuration
 ------------------------------
@@ -1739,53 +1847,56 @@ Esses endpoints retornam a configuração do método auth no caminho fornecido.
 
 ### Sample Request
 
-curl \\
+```shell
+curl \
 
-    --header "X-Vault-Token: ..." \\
+    --header "X-Vault-Token: ..." \
 
     http://127.0.0.1:8200/v1/sys/auth/my-auth
+```
 
 ### Sample Response
 
+```json
 {
 
-  "request\_id": "8d2a1e33-4c00-46a5-f50d-4dc5f5d96f12",
+  "request_id": "8d2a1e33-4c00-46a5-f50d-4dc5f5d96f12",
 
-  "lease\_id": "",
+  "lease_id": "",
 
-  "lease\_duration": 0,
+  "lease_duration": 0,
 
   "renewable": false,
 
   "data": {
 
-    "accessor": "auth\_github\_badd7fd0",
+    "accessor": "auth_github_badd7fd0",
 
     "config": {
 
-      "default\_lease\_ttl": 0,
+      "default_lease_ttl": 0,
 
-      "force\_no\_cache": false,
+      "force_no_cache": false,
 
-      "max\_lease\_ttl": 0,
+      "max_lease_ttl": 0,
 
-      "token\_type": "default-service"
+      "token_type": "default-service"
 
     },
 
-    "deprecation\_status": "supported",
+    "deprecation_status": "supported",
 
     "description": "",
 
-    "external\_entropy\_access": false,
+    "external_entropy_access": false,
 
     "local": false,
 
     "options": null,
 
-    "plugin\_version": "",
+    "plugin_version": "",
 
-    "running\_plugin\_version": "v1.12.0+builtin.vault",
+    "running_plugin\_version": "v1.12.0+builtin.vault",
 
     "running\_sha256": "",
 
@@ -1800,13 +1911,14 @@ curl \\
   "warnings": null
 
 }
+```
 
 Disable Auth Method
 -------------------
 
 Este endpoint desativa o método auth no caminho de autenticação fornecido.
 
-*   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.
+*   sudo required – esse ponto de extremidade requer `sudo` recursos além de quaisquer recursos específicos do caminho.
 
 ![](images/image7.png)
 
@@ -1816,51 +1928,38 @@ Este endpoint desativa o método auth no caminho de autenticação fornecido.
 
 ### Sample Request
 
-curl \\
+```shell
+curl \
 
-    --header "X-Vault-Token: ..." \\
+    --header "X-Vault-Token: ..." \
 
-    --request DELETE \\
+    --request DELETE \
 
     http://127.0.0.1:8200/v1/sys/auth/my-auth
+```
 
 Read Auth Method Tuning
 -----------------------
 
-Este endpoint lê a configuração do caminho de autenticação fornecido. Esse ponto de extremidade requer sudo capacidade no caminho final, mas a mesma funcionalidade pode ser obtida sem sudo via sys/mounts/auth/\[auth-path\]/tune.
+Este endpoint lê a configuração do caminho de autenticação fornecido. Esse ponto de extremidade requer sudo capacidade no caminho final, mas a mesma funcionalidade pode ser obtida sem `sudo` via `sys/mounts/auth/\[auth-path\]/tune`.
 
-*   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.
+*   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.
 
-[\[a\]](#cmnt_ref1)ITEM 2.3.3 Devem ser implementados mecanismos de criptografia para proteger a base de dados, o cofre de senhas e todas as informações armazenadas e tratadas pelos componentes da solução;
 
-[\[b\]](#cmnt_ref2)2.3.5 A criptografia implementada pela solução deve se basear em algoritmos e parâmetros fortes, incluindo no mínimo os padrões RSA-2048, AES-256 e SHA-256, e deve ser compatível com o padrão FIPS 140-2.
-
-[\[c\]](#cmnt_ref3)Compatibilidade com OpenShift
-
-[\[d\]](#cmnt_ref4)ITEM: 2.60 A solução deverá incluir mecanismo de atualização dos seus componentes, possibilitando ao administrador a aplicação das atualizações sob demanda.
-
-[\[e\]](#cmnt_ref5)ITEM 2.60.1 A documentação da solução deve detalhar o processo recomendado de atualização, incluindo a ordem de atualização dos componentes e o procedimento necessário para baixar e aplicar cada atualização, para que assim possam ser evitados conflitos de versão que causem problemas de incompatibilidade entre os diferentes nós de um mesmo componente e entre os componentes da solução como um todo.
-
-[\[f\]](#cmnt_ref6)ITEM 2.3.4 Os componentes da solução devem se comunicar de forma criptografada e mediante autenticação mútua.
-
-[\[g\]](#cmnt_ref7)2.4 Os componentes da solução, como sua console Web, jump server, cofre de senhas e base de dados, devem funcionar em alta disponibilidade (ativo/passivo) ou em balanceamento de carga (ativo/ativo), de forma distribuída em 2 (dois) sites para contingência e em um 3º site para recuperação de desastres.
-
-[\[h\]](#cmnt_ref8)ITEM 2.40.2 Deve ser possível implementar mais de uma instância do componente para garantir sua alta disponibilidade.
-
-[\[i\]](#cmnt_ref9)ITEM 2.59 Os componentes da solução devem se monitorar de forma automática para identificar eventuais problemas de performance ou disponibilidade e, caso necessário, chavear determinado componente para outro nó em caso de falha, ou suportar a utilização de balanceador de carga externo que execute o chaveamento.
-
-[\[j\]](#cmnt_ref10)ITEM 2.62 Deve ser possível exportar a chave de criptografia do cofre de senhas da solução para utilização excepcional em um cenário de recuperação de desastre, permitindo o acesso a todas as credenciais do cofre após restauração de backup em uma nova instalação da solução.
-
-[\[k\]](#cmnt_ref11)ITEM 2.5.2 O backup das credenciais deve ser criptografado.
-
-[\[l\]](#cmnt_ref12)ITEM 2.62.1 Como alternativa à funcionalidade acima, a solução poderá oferecer mecanismo para exportar o cofre de senhas para um arquivo criptografado, que poderá ser acessado utilizando ferramenta off-line da solução mediante autenticação com senha de dupla custódia.
-
-[\[m\]](#cmnt_ref13)ITEM 2.61 A solução deverá permitir a criação de uma conta de acesso emergencial (“break glass”), que poderá, após autenticação por 2 fatores, acessar qualquer credencial do cofre de senhas.
-
-[\[n\]](#cmnt_ref14)ITEM 2.61.1 A utilização da conta de acesso emergencial deve ser registrada em log de auditoria, permitindo a geração de alertas específicos, conforme definido pelo administrador.
-
-[\[o\]](#cmnt_ref15)ITEM 2.6.1 A console deve ser compatível com pelo menos dois dos seguintes navegadores: Microsoft Edge 96 ou superior; Google Chrome 96 ou superior; Mozilla Firefox 91 ou superior.
-
-[\[p\]](#cmnt_ref16)ITEM 2.63 O fabricante da solução e a revenda não deverão ter acesso à chave de criptografia do cofre de senhas ou a qualquer outra forma de backdoor da solução.
-
-[\[q\]](#cmnt_ref17)ITEM 2.6.3 A console deve permitir a integração com soluções de múltiplos fatores de autenticação, incluindo também o suporte a token/smartcard com certificado digital.
+|[\[a\]](#cmnt_ref1)<p>ITEM 2.3.3|</p><p> Devem ser implementados mecanismos de criptografia para proteger a base de dados, o cofre de senhas e todas as informações armazenadas e tratadas pelos componentes da solução;|</p>
+|[\[b\]](#cmnt_ref2)<p>2.3.5|</p><p> A criptografia implementada pela solução deve se basear em algoritmos e parâmetros fortes, incluindo no mínimo os padrões RSA-2048, AES-256 e SHA-256, e deve ser compatível com o padrão FIPS 140-2.|</p>
+|[\[c\]](#cmnt_ref3)<p>Compatibilidade com OpenShift|</p><p>|</p>
+|[\[d\]](#cmnt_ref4)<p>ITEM: 2.60|</p><p> A solução deverá incluir mecanismo de atualização dos seus componentes, possibilitando ao administrador a aplicação das atualizações sob demanda.|</p>
+|[\[e\]](#cmnt_ref5)<p>ITEM 2.60.1|</p><p> A documentação da solução deve detalhar o processo recomendado de atualização, incluindo a ordem de atualização dos componentes e o procedimento necessário para baixar e aplicar cada atualização, para que assim possam ser evitados conflitos de versão que causem problemas de incompatibilidade entre os diferentes nós de um mesmo componente e entre os componentes da solução como um todo.|</p>
+|[\[f\]](#cmnt_ref6)<p>ITEM 2.3.4|</p><p> Os componentes da solução devem se comunicar de forma criptografada e mediante autenticação mútua.|</p>
+|[\[g\]](#cmnt_ref7)<p>2.4|</p><p> Os componentes da solução, como sua console Web, jump server, cofre de senhas e base de dados, devem funcionar em alta disponibilidade (ativo/passivo) ou em balanceamento de carga (ativo/ativo), de forma distribuída em 2 (dois) sites para contingência e em um 3º site para recuperação de desastres.|</p>
+|[\[h\]](#cmnt_ref8)<p>ITEM 2.40.2|</p><p> Deve ser possível implementar mais de uma instância do componente para garantir sua alta disponibilidade.|</p>
+|[\[i\]](#cmnt_ref9)<p>ITEM 2.59|</p><p> Os componentes da solução devem se monitorar de forma automática para identificar eventuais problemas de performance ou disponibilidade e, caso necessário, chavear determinado componente para outro nó em caso de falha, ou suportar a utilização de balanceador de carga externo que execute o chaveamento.|</p>
+|[\[j\]](#cmnt_ref10)<p>ITEM 2.62|</p><p> Deve ser possível exportar a chave de criptografia do cofre de senhas da solução para utilização excepcional em um cenário de recuperação de desastre, permitindo o acesso a todas as credenciais do cofre após restauração de backup em uma nova instalação da solução.|</p>
+|[\[k\]](#cmnt_ref11)<p>ITEM 2.5.2|</p><p> O backup das credenciais deve ser criptografado.|</p>
+|[\[l\]](#cmnt_ref12)<p>ITEM 2.62.1|</p><p> Como alternativa à funcionalidade acima, a solução poderá oferecer mecanismo para exportar o cofre de senhas para um arquivo criptografado, que poderá ser acessado utilizando ferramenta off-line da solução mediante autenticação com senha de dupla custódia.|</p>
+|[\[m\]](#cmnt_ref13)<p>ITEM 2.61|</p><p> A solução deverá permitir a criação de uma conta de acesso emergencial (“break glass”), que poderá, após autenticação por 2 fatores, acessar qualquer credencial do cofre de senhas.|</p>
+|[\[n\]](#cmnt_ref14)<p>ITEM 2.61.1|</p><p> A utilização da conta de acesso emergencial deve ser registrada em log de auditoria, permitindo a geração de alertas específicos, conforme definido pelo administrador.|</p>
+|[\[o\]](#cmnt_ref15)<p>ITEM 2.6.1|</p><p> A console deve ser compatível com pelo menos dois dos seguintes navegadores: Microsoft Edge 96 ou superior; Google Chrome 96 ou superior; Mozilla Firefox 91 ou superior.|</p>
+|[\[p\]](#cmnt_ref16)<p>ITEM 2.63|</p><p> O fabricante da solução e a revenda não deverão ter acesso à chave de criptografia do cofre de senhas ou a qualquer outra forma de backdoor da solução.|</p>
+|[\[q\]](#cmnt_ref17)<p>ITEM 2.6.3|</p><p> A console deve permitir a integração com soluções de múltiplos fatores de autenticação, incluindo também o suporte a token/smartcard com certificado digital.|</p>
