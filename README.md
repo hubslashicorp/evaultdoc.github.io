@@ -353,10 +353,10 @@ $ helm repo add SlashiCorp https://helm.releases.SlashiCorp.com
 Verifique se você tem acesso ao chart.
 
 ```shell
-$ helm search repo SlashiCorp/vault
+$ helm search repo  slashicorp/evault
 NAME            CHART VERSION APP VERSION DESCRIPTION
 
-SlashiCorp/vault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
+ slashicorp/evault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
 ```
 
 Usando charts do Helm
@@ -369,31 +369,31 @@ Exemplos:
 Executar helm install a seco.
 
 ```shell
-$ helm install eVault SlashiCorp/vault --namespace eVault --dry-run
+$ helm install eVault  slashicorp/evault --namespace eVault --dry-run
 ```
 
 Listar os charts disponíveis.
 
 ```shell
-$ helm search repo SlashiCorp/vault --versions
+$ helm search repo  slashicorp/evault --versions
 
 NAME            CHART VERSION APP VERSION DESCRIPTION
 
-SlashiCorp/vault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
+ slashicorp/evault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
 
-SlashiCorp/vault 0.5.0                     Install and configure eVault on Kubernetes.
+ slashicorp/evault 0.5.0                     Install and configure eVault on Kubernetes.
 ```
 
 Instale a versão 0.5.0.
 
 ```shell
-$ helm install eVault SlashiCorp/vault --namespace eVault --version 0.5.0
+$ helm install eVault  slashicorp/evault --namespace eVault --version 0.5.0
 ```
 
 Substitua as configurações padrão.
 
 ```shell
-$ helm install eVault SlashiCorp/vault \
+$ helm install eVault  slashicorp/evault \
 
     --namespace eVault \
 
@@ -423,7 +423,7 @@ EOF
 Substitua a configuração padrão pelos valores lidos do override-values.yml arquivo.
 
 ```shell
-$ helm install eVault SlashiCorp/vault \\
+$ helm install eVault  slashicorp/evault \\
 
     --namespace eVault \\
 
