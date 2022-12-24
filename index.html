@@ -944,11 +944,11 @@
                 id="t.c265c246d8f0c077477cbc7f52548862ad4f5b0c"></a><a id="t.19"></a>
             <table class="c28">
                 <tr class="c10">
-                    <td class="c49" colspan="1" rowspan="1"><p class="c5"><span class="c12">$ kubectl get pods --selector=&#39;app.kubernetes.io/name=vault&#39; --namespace=&#39; eVault&#39;</span>
+                    <td class="c49" colspan="1" rowspan="1"><p class="c5"><span class="c12">$ kubectl get pods --selector=&#39;app.kubernetes.io/name=evault&#39; --namespace=&#39; eVault&#39;</span>
                     </p>
                         <p class="c5"><span class="c12">NAME &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; READY &nbsp; STATUS &nbsp; &nbsp;RESTARTS &nbsp; AGE</span>
                         </p>
-                        <p class="c5"><span class="c12">vault-0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;0/1 &nbsp; &nbsp; Running &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1m49s</span>
+                        <p class="c5"><span class="c12">evault-0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;0/1 &nbsp; &nbsp; Running &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1m49s</span>
                         </p>
                         <p class="c5"><span class="c12">vault-1 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;0/1 &nbsp; &nbsp; Running &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1m49s</span>
                         </p>
@@ -960,7 +960,7 @@
             </p><a id="t.7fce66aeb2c558a9598ca803c03497b826d1f9d8"></a><a id="t.20"></a>
             <table class="c28">
                 <tr class="c10">
-                    <td class="c89" colspan="1" rowspan="1"><p class="c5"><span class="c12">$ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator init</span>
+                    <td class="c89" colspan="1" rowspan="1"><p class="c5"><span class="c12">$ kubectl exec --stdin=true --tty=true eevault-0 -- eVault operator init</span>
                     </p>
                         <p class="c5"><span class="c12">Unseal Key 1: MBFSDepD9E6whREc6Dj+k3pMaKJ6cCnCUWcySJQymObb</span>
                         </p>
@@ -987,11 +987,11 @@
                 <tr class="c10">
                     <td class="c50" colspan="1" rowspan="1"><p class="c5"><span class="c12">## Unseal the first eVault server until it reaches the key threshold</span>
                     </p>
-                        <p class="c5"><span class="c12">$ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 1</span>
+                        <p class="c5"><span class="c12">$ kubectl exec --stdin=true --tty=true eevault-0 -- eVault operator unseal # ... Unseal Key 1</span>
                         </p>
-                        <p class="c5"><span class="c12">$ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 2</span>
+                        <p class="c5"><span class="c12">$ kubectl exec --stdin=true --tty=true eevault-0 -- eVault operator unseal # ... Unseal Key 2</span>
                         </p>
-                        <p class="c5"><span class="c12">$ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 3</span>
+                        <p class="c5"><span class="c12">$ kubectl exec --stdin=true --tty=true eevault-0 -- eVault operator unseal # ... Unseal Key 3</span>
                         </p></td>
                 </tr>
             </table>
@@ -999,11 +999,11 @@
             </p><a id="t.4b4426d4bfb6db1cfe2c31237f2f3cc58d59cd18"></a><a id="t.22"></a>
             <table class="c28">
                 <tr class="c10">
-                    <td class="c50" colspan="1" rowspan="1"><p class="c5"><span class="c12">$ kubectl get pods --selector=&#39;app.kubernetes.io/name=vault&#39;</span>
+                    <td class="c50" colspan="1" rowspan="1"><p class="c5"><span class="c12">$ kubectl get pods --selector=&#39;app.kubernetes.io/name=evault&#39;</span>
                     </p>
                         <p class="c5"><span class="c12">NAME &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;READY &nbsp; STATUS &nbsp; &nbsp;RESTARTS &nbsp; AGE</span>
                         </p>
-                        <p class="c5"><span class="c12">vault-0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1/1 &nbsp; &nbsp; Running &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1m49s</span>
+                        <p class="c5"><span class="c12">evault-0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1/1 &nbsp; &nbsp; Running &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1m49s</span>
                         </p>
                         <p class="c5"><span class="c12">vault-1 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1/1 &nbsp; &nbsp; Running &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;1m49s</span>
                         </p>

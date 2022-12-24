@@ -616,10 +616,10 @@ Após a instalação do gráfico do eVault Helm, um dos servidores do eVault pre
 Visualize todos os pods do eVault no namespace atual:
 
 ```shell
-$ kubectl get pods --selector='app.kubernetes.io/name=vault' --namespace=' eVault'
+$ kubectl get pods --selector='app.kubernetes.io/name=evault' --namespace=' eVault'
 
 NAME                               READY   STATUS    RESTARTS   AGE
-vault-0                            0/1     Running   0          1m49s
+evault-0                            0/1     Running   0          1m49s
 vault-1                            0/1     Running   0          1m49s
 vault-2                            0/1     Running   0          1m49s
 ```
@@ -627,7 +627,7 @@ vault-2                            0/1     Running   0          1m49s
 Inicialize um servidor eVault com o número padrão de compartilhamentos de chave e limite de chave padrão:
 
 ```shell
-$ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator init
+$ kubectl exec --stdin=true --tty=true eevault-0 -- eVault operator init
 
 Unseal Key 1: MBFSDepD9E6whREc6Dj+k3pMaKJ6cCnCUWcySJQymObb
 Unseal Key 2: zQj4v22k9ixegS+94HJwmIaWLBL3nZHe1i+b/wHz25fr
@@ -645,18 +645,18 @@ Abra o servidor eVault com os compartilhamentos de chave até que o limite de ch
 ```shell
 ## Unseal the first eVault server until it reaches the key threshold
 
-$ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 1
-$ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 2
-$ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 3
+$ kubectl exec --stdin=true --tty=true eevault-0 -- eVault operator unseal # ... Unseal Key 1
+$ kubectl exec --stdin=true --tty=true eevault-0 -- eVault operator unseal # ... Unseal Key 2
+$ kubectl exec --stdin=true --tty=true eevault-0 -- eVault operator unseal # ... Unseal Key 3
 ```
 
 Repita o processo de abertura para todos os pods do servidor eVault. Quando todos os pods do servidor eVault são abertos, eles reportam READY 1/1.
 
 ```shell
-$ kubectl get pods --selector='app.kubernetes.io/name=vault'
+$ kubectl get pods --selector='app.kubernetes.io/name=evault'
 
 NAME                                READY   STATUS    RESTARTS   AGE
-vault-0                              1/1     Running   0          1m49s
+evault-0                              1/1     Running   0          1m49s
 vault-1                              1/1     Running   0          1m49s
 vault-2                              1/1     Running   0          1m49s
 ```
