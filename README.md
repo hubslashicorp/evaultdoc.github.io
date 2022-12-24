@@ -1620,7 +1620,7 @@ curl \
 Read Auth Method Tuning
 -----------------------
 
-Este endpoint lê a configuração do caminho de autenticação fornecido. Esse ponto de extremidade requer sudo capacidade no caminho final, mas a mesma funcionalidade pode ser obtida sem `sudo` via `sys/mounts/auth/[auth-path\]/tune`.
+Este endpoint lê a configuração do caminho de autenticação fornecido. Esse ponto de extremidade requer sudo capacidade no caminho final, mas a mesma funcionalidade pode ser obtida sem `sudo` via `sys/mounts/auth/[auth-path]/tune`.
 
 *   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.
 
