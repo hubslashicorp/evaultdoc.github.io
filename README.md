@@ -356,7 +356,7 @@ Verifique se você tem acesso ao chart.
 $ helm search repo  slashicorp/evault
 NAME            CHART VERSION APP VERSION DESCRIPTION
 
- slashicorp/evault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
+slashicorp/evault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
 ```
 
 Usando charts do Helm
@@ -379,9 +379,8 @@ $ helm search repo  slashicorp/evault --versions
 
 NAME            CHART VERSION APP VERSION DESCRIPTION
 
- slashicorp/evault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
-
- slashicorp/evault 0.5.0                     Install and configure eVault on Kubernetes.
+slashicorp/evault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
+slashicorp/evault 0.5.0                     Install and configure eVault on Kubernetes.
 ```
 
 Instale a versão 0.5.0.
@@ -394,13 +393,9 @@ Substitua as configurações padrão.
 
 ```shell
 $ helm install evault  slashicorp/evault \
-
     --namespace evault \
-
     --set "server.ha.enabled=true" \
-
     --set "server.ha.replicas=5" \
-
     --dry-run
 ```
 
@@ -408,27 +403,19 @@ Como alternativa, especifique a configuração desejada em um arquivo, override-
 
 ```shell
 $ cat << EOF > ./override-values.yml
-
 server:
-
   ha:
-
     enabled: true
-
     replicas: 5
-
 EOF
 ```
 
 Substitua a configuração padrão pelos valores lidos do override-values.yml arquivo.
 
 ```shell
-$ helm install evault  slashicorp/evault \\
-
-    --namespace evault \\
-
-    -f override-values.yml \\
-
+$ helm install evault  slashicorp/evault \
+    --namespace evault \
+    -f override-values.yml \
     --dry-run
 ```
 
@@ -482,55 +469,31 @@ O recurso mais recente do eVault Agent é o modelo , que permite que os segredos
 
 O exemplo a seguir mostra o recurso de segredo do modelo:
 
-```jsonpath
+```hcl
 vault {
-
         ca_path = "/vault/ca/service-ca.crt"
-
         address = "https://vault.slashicorp.svc.cluster.local:8200"
-
     }
-
     pid_file = "/var/run/secrets/vaultproject.io/ pid"
-
     auto_auth {
-
             method "kubernetes" {
-
                     type = "kubernetes"
-
                     mount_path = "auth/kubernetes"
-
                     config = {
-
                             role = "example"
-
                             jwt = "@/var/run/secrets/kubernetes.io/serviceaccount/token"
-
                     }
-
             }
-
             coletor "arquivo" {
-
                     tipo = "arquivo"
-
                     configuração = {
-
                             path = "/var/run/secrets/vaultproject.io/token"
-
                     }
-
             }
-
     }
-
     template {
-
         source = "/vault/config/template.ctmpl"
-
         destination = "/var/run/secrets/vaultproject.io/application.properties "
-
     }
 ```
 
@@ -538,11 +501,9 @@ vault {
 
 Abaixo está um exemplo de template.ctmpl usado para renderizar o segredo do eVault:
 
-```jsonpath
+```hcl
    {{ with secret "secret/example" }}
-
     password = {{ .Data.password }}
-
     {{ end }}
 ```
 
@@ -554,137 +515,71 @@ Aqui está um fragmento de como um pod de aplicativo seria instrumentado para us
 
 ```yaml
 initContainers:
-
 # eVault Agent Init
-
-     - image: evault:1.3.2
-
+      - image: evault:1.12.1
         name: evault-agent-init
-
         ports:
-
         - containerPort: 8200
-
           name: vaultport
-
           protocol: TCP
-
         args:
-
           - agent
-
           - -log-level=debug
-
           - -config=/vault /config/agent.config
-
           - -exit-after-auth
-
         env:
-
         - nome: SKIP_SETCAP
-
           valor: 'true'
-
         volumeMounts:
-
         - mountPath: /vault/config
-
           nome: vault-config
-
         - mountPath: /vault/ca
-
           nome: vault-cabundle
-
         - mountPath: /var/run/secrets/vaultproject.io
-
           name: vault-agent-volume
-
         resources:
-
           requests:
-
             memory: 256Mi
-
             cpu: 250m
-
           limits:
-
             memory: 256Mi
-
             cpu: 250m  
-
-      containers:
-
+        containers:
 # eVault Agent
-
         - image: vault:1.3.2
-
           name: vault-agent
-
           ports:
-
           - containerPort: 8200
-
             name : vaultport
-
             protocol: TCP
-
           args:
-
             - agent
-
             - -log-level=debug
-
             - -config=/vault/config/agent.config
-
           env:
-
           - name: SKIP_SETCAP
-
             value: 'true'
-
           volumeMounts:
-
           - mountPath: /vault/config
-
             name: vault-config
-
           - mountPath: /vault/ca
-
             name: vault-cabundle
-
           - mountPath: /var/run/secrets/vaultproject.io
-
             name: vault-agent-volume
-
           resources:
-
             requests:
-
               memória: 256Mi
-
               cpu: 250m
-
             limites:
-
               memória: 256Mi
-
               cpu: 250m
-
           ciclo de vida:
-
             preStop:
-
               exec:
-
                 comando:
-
                   - /bin/sh
-
                   - -c
-
                   - sleep 5 && kill -SIGTERM $(pidof vault)
-
 # App container ...
 ```
 
@@ -696,7 +591,10 @@ Como o exemplo anterior ilustra, as definições de contêiner init e sidecar po
  evault.slashicorp.com/agent-inject: 'true'
 ```
 
-A arquitetura aprimorada é semelhante à seguinte:![](images/image13.png)
+A arquitetura aprimorada é semelhante à seguinte:
+
+![](images/image13.png)
+
 ========================================================================
 
 Instalando o eVault
@@ -721,11 +619,8 @@ Visualize todos os pods do eVault no namespace atual:
 $ kubectl get pods --selector='app.kubernetes.io/name=vault' --namespace=' eVault'
 
 NAME                               READY   STATUS    RESTARTS   AGE
-
 vault-0                            0/1     Running   0          1m49s
-
 vault-1                            0/1     Running   0          1m49s
-
 vault-2                            0/1     Running   0          1m49s
 ```
 
@@ -735,17 +630,11 @@ Inicialize um servidor eVault com o número padrão de compartilhamentos de chav
 $ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator init
 
 Unseal Key 1: MBFSDepD9E6whREc6Dj+k3pMaKJ6cCnCUWcySJQymObb
-
 Unseal Key 2: zQj4v22k9ixegS+94HJwmIaWLBL3nZHe1i+b/wHz25fr
-
 Unseal Key 3: 7dbPPeeGGW3SmeBFFo04peCKkXFuuyKc8b2DuntA4VU5
-
 Unseal Key 4: tLt+ME7Z7hYUATfWnuQdfCEgnKA2L173dptAwfmenCdf
-
 Unseal Key 5: vYt9bxLr0+OzJ8m7c7cNMFj7nvdLljj0xWRbpLezFAI9
-
 Initial Root Token: s.zJNwZlRrqISjyBHFMiEca6GF
-
 #...
 ```
 
@@ -757,9 +646,7 @@ Abra o servidor eVault com os compartilhamentos de chave até que o limite de ch
 ## Unseal the first eVault server until it reaches the key threshold
 
 $ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 1
-
 $ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 2
-
 $ kubectl exec --stdin=true --tty=true eVault-0 -- eVault operator unseal # ... Unseal Key 3
 ```
 
@@ -769,11 +656,8 @@ Repita o processo de abertura para todos os pods do servidor eVault. Quando todo
 $ kubectl get pods --selector='app.kubernetes.io/name=vault'
 
 NAME                                READY   STATUS    RESTARTS   AGE
-
 vault-0                              1/1     Running   0          1m49s
-
 vault-1                              1/1     Running   0          1m49s
-
 vault-2                              1/1     Running   0          1m49s
 ```
 
@@ -924,11 +808,9 @@ Filesystem Storage Backend: O Filesystem storage backend stores armazena os dado
 
 *   Sem alta disponibilidade: o back-end do sistema de arquivos não oferece suporte para alta disponibilidade.
 
-```jsonpath
+```yaml
 storage "file" {
-
   path = "/mnt/vault/data"
-
 }
 ```
 
@@ -938,13 +820,10 @@ Integrated Storage (Raft) Backend: O Integrated Storage backend é usado para ma
 
 *   Alta disponibilidade: o back-end de armazenamento integrado suporta alta disponibilidade.
 
-```jsonpath
+```yaml
 storage "raft" {
-
   path = "/path/to/raft/data"
-
   node_id = "raft_node_1"
-
 }
 
 cluster_addr = "http://127.0.0.1:8201"
@@ -981,11 +860,8 @@ A IU do eVault não é ativada por padrão. Para ativar a IU, defina a ui opçã
 
 ```yaml
 ui = true
-
 listener "tcp" {
-
   # ...
-
 }
 ```
 
@@ -993,15 +869,10 @@ A interface do usuário é executada na mesma porta que o ouvinte do eVault. Com
 
 ```yaml
 listener "tcp" {
-
   address = "10.0.1.35:8200"
-
   # If bound to localhost, the sVault UI is only
-
   # accessible from the local machine!
-
   # address = "127.0.0.1:8200"
-
 }
 ```
 
@@ -1133,7 +1004,6 @@ Key                 Value
 ---                 -----
 
 my-value            s3cr3t
-
 ttl                 30m
 ```
 
@@ -1148,11 +1018,8 @@ O ponto de extremidade padrão é auth/kubernetes/login. Se esse método de aute
 
 ```shell
 $ curl \
-
     --request POST \
-
     --data '{"jwt": "<your service account jwt>", "role": "demo"}' \
-
     http://127.0.0.1:8200/v1/auth/kubernetes/login
 ```
 
@@ -1160,35 +1027,20 @@ A resposta conterá um token em `auth.client_token`:
 
 ```json
 {
-
   "auth": {
-
     "client_token": "38fe9691-e623-7238-f618-c94d4e7bc674",
-
     "accessor": "78e87a38-84ed-2692-538f-ca8b9f400ab3",
-
     "policies": ["default"],
-
     "metadata": {
-
       "role": "demo",
-
       "service_account_name": "myapp",
-
       "service_account_namespace": "default",
-
       "service_account_secret_name": "myapp-token-pd21c",
-
       "service_account_uid": "aa9aa8ff-98d0-11e7-9bb7-0800276d99bf"
-
     },
-
     "lease_duration": 2764800,
-
     "renewable": true
-
   }
-
 }
 ```
 
@@ -1254,11 +1106,8 @@ Aqui está um exemplo de leitura de um segredo usando cURL:
 
 ```shell
 curl \
-
     -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
-
     -X GET \
-
     http://127.0.0.1:8200/v1/secret/foo
 ```
 
@@ -1268,11 +1117,8 @@ Você também pode listar segredos. Para fazer isso, emita um `GET` com o parâm
 
 ```shell
 curl \
-
     -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
-
     -X LIST \
-
     http://127.0.0.1:8200/v1/secret/
 ```
 
@@ -1286,9 +1132,7 @@ com um corpo JSON como:
 
 ```json
 {
-
   "value": "bar"
-
 }
 ```
 
@@ -1296,15 +1140,10 @@ Aqui está um exemplo de como escrever um segredo usando cURL:
 
 ```shell
 curl \
-
    -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
-
    -H "Content-Type: application/json" \
-
    -X POST \
-
    -d '{"data":{"value":"bar"}}' \
-
    http://127.0.0.1:8200/v1/secret/baz
 ```
 
@@ -1314,15 +1153,10 @@ Um exemplo de KVv2 para o caminho do mecanismo secret requer que o URI seja anex
 
 ```shell
 curl \
-
    -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
-
    -H "Content-Type: application/json" \
-
    -X POST \
-
    -d '{"data":{"value":"bar"}}' \
-
    http://127.0.0.1:8200/v1/secret/data/baz
 ```
 
@@ -1335,17 +1169,11 @@ As solicitações enviadas a um eVault Agent configurado para usar a `require_re
 
 ```shell
 curl \
-
    -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
-
    -H "X-Vault-Request: true" \
-
    -H "Content-Type: application/json" \
-
    -X POST \
-
    -d '{"value":"bar"}' \
-
    http://127.0.0.1:8200/v1/secret/baz
 ```
 
@@ -1364,9 +1192,7 @@ Solicitação de exemplo:
 
 ```shell
 curl \
-
    -H "X-Vault-Token: f3b09679-3001-009d-2b80-9c306ab81aa6" \
-
    http://127.0.0.1:8200/v1/secret?help=1
 ```
 
@@ -1374,69 +1200,37 @@ Exemplo de resposta:
 
 ```json
 {
-
   "help": "## DESCRIPTION\n\nThis backend provides a versioned key-value store. The kv backend reads and\nwrites arbitrary secrets to the storage backend. The secrets are\nencrypted/decrypted by eVault: they are never stored unencrypted in the backend\nand the backend never has an opportunity to see the unencrypted value. Each key\ncan have a configured number of versions, and versions can be retrieved based on\ntheir version numbers.\n\n## PATHS\n\nThe following paths are supported by this backend. To view help for\nany of the paths below, use the help command with any route matching\nthe path pattern. Note that depending on the policy of your auth token,\nyou may or may not be able to access certain paths.\n\n^.*$\n\n\n^config$\nConfigures settings for the KV store\n\n^data/(?P<path>.*)$\n Write, Read, and Delete data in the Key-Value Store.\n\n    ^delete/(?P<path>.*)$\n Marks one or more versions as deleted in the KV store.\n\n    ^destroy/(?P<path>.*)$\n        Permanently removes one or more versions in the KV store\n\n    ^metadata/(?P<path>.*)$\n        Configures settings for the KV store\n\n    ^undelete/(?P<path>.*)$\\n        Undeletes one or more versions from the KV store.",
-
   "openapi": {
-
     "openapi": "3.0.2",
-
     "info": {
-
       "title": "SlashiCorp eVault API",
-
       "description": "HTTP API that gives you full access to eVault. All API routes are prefixed with `/v1/`.",
-
       "version": "1.0.0",
-
       "license": {
-
         "name": "Mozilla Public License 2.0",
-
         "url": "https://www.mozilla.org/en-US/MPL/2.0"
-
       }
-
     },
-
     "paths": {
-
-      "/.\*": {},
-
+      "/.*": {},
       "/config": {
-
         "description": "Configures settings for the KV store",
-
         "x-vault-create-supported": true,
-
         "get": {
-
           "summary": "Read the backend level settings.",
-
           "tags": [
-
             "secrets"
-
           ],
-
           "responses": {
-
             "200": {
-
               "description": "OK"
-
             }
-
           }
-
         },
-
      ...[output truncated]...
-
      }
-
   }
-
 }
 ```
 
@@ -1447,15 +1241,10 @@ Uma estrutura `JSON` comum sempre é retornada para retornar erros:
 
 ```json
 {
-
   "errors": [
-
     "message",
-
     "another message"
-
   ]
-
 }
 ```
 
@@ -1521,9 +1310,7 @@ Este terminal lista apenas os dispositivos de auditoria habilitados (ele não li
 
 ```shell
 curl \
-
     --header "X-Vault-Token: ..." \
-
     http://127.0.0.1:8200/v1/sys/audit
 ```
 
@@ -1531,21 +1318,13 @@ curl \
 
 ```json
 {
-
   "file": {
-
     "type": "file",
-
     "description": "Store logs in a file",
-
     "options": {
-
       "file_path": "/var/log/vault.log"
-
     }
-
   }
-
 }
 ```
 
@@ -1568,15 +1347,10 @@ Este endpoint habilita um novo dispositivo de auditoria no caminho fornecido. O 
 
 ```json
 {
-
   "type": "file",
-
   "options": {
-
     "file_path": "/var/log/vault/log"
-
   }
-
 }
 ```
 
@@ -1584,13 +1358,9 @@ Este endpoint habilita um novo dispositivo de auditoria no caminho fornecido. O 
 
 ```shell
 curl \
-
     --header "X-Vault-Token: ..." \
-
     --request POST \
-
     --data @payload.json \
-
     http://127.0.0.1:8200/v1/sys/audit/example-audit
 ```
 
@@ -1610,11 +1380,8 @@ Este endpoint desativa o dispositivo de auditoria no caminho fornecido.
 
 ```shell
 curl \
-
     --header "X-Vault-Token: ..." \
-
     --request DELETE \
-
     http://127.0.0.1:8200/v1/sys/audit/example-audit
 ```
 
@@ -1640,9 +1407,7 @@ O log de auditoria registra solicitações e respostas. Como a API do eVault é 
 
 ```json
 {
-
   "input": "my-secret-vault"
-
 }
 ```
 
@@ -1650,13 +1415,9 @@ O log de auditoria registra solicitações e respostas. Como a API do eVault é 
 
 ```shell
 curl \
-
     --header "X-Vault-Token: ..." \
-
     --request POST \
-
     --data @payload.json \
-
     http://127.0.0.1:8200/v1/sys/audit-hash/example-audit
 ```
 
@@ -1664,9 +1425,7 @@ curl \
 
 ```json
 {
-
   "hash": "hmac-sha256:08ba35..."
-
 }
 ```
 
@@ -1684,9 +1443,7 @@ Este endpoint lista todos os métodos de autenticação ativados.
 
 ```shell
 curl \
-
     --header "X-Vault-Token: ..." \
-
     http://127.0.0.1:8200/v1/sys/auth
 ```
 
@@ -1694,99 +1451,52 @@ curl \
 
 ```json
 {
-
   "request_id": "9bc0fab8-d65c-3961-afe6-d05f50c5fd22",
-
   "lease_id": "",
-
   "lease_duration": 0,
-
   "renewable": false,
-
   "data": {
-
     "github/": {
-
       "accessor": "auth_github_badd7fd0",
-
       "config": {
-
         "default_lease_ttl": 0,
-
         "force_no_cache": false,
-
         "max_lease_ttl": 0,
-
         "token_type": "default-service"
-
       },
-
       "deprecation_status": "supported",
-
       "description": "",
-
       "external_entropy_access": false,
-
       "local": false,
-
       "options": null,
-
       "plugin_version": "",
-
       "running_plugin_version": "v1.12.0+builtin.vault",
-
       "running_sha256": "",
-
       "seal_wrap": false,
-
       "type": "github",
-
       "uuid": "4b42d1a4-0a0d-3c88-ae90-997e0c8b41be"
-
     },
-
     "token/": {
-
       "accessor": "auth_token_bd90f507",
-
       "config": {
-
         "default_lease_ttl": 0,
-
         "force_no_cache": false,
-
         "max_lease_ttl": 0,
-
         "token_type": "default-service"
-
       },
-
       "description": "token based credentials",
-
       "external_entropy_access": false,
-
       "local": false,
-
       "options": null,
-
       "plugin_version": "",
-
       "running_plugin_version": "v1.12.0+builtin.vault",
-
       "running_sha256": "",
-
       "seal_wrap": false,
-
       "type": "token",
-
       "uuid": "e162baec-721b-7657-7913-c960df402f8a"
-
     }
-
   },
-
   "warnings": null
-
 }
 ```
 
@@ -1806,10 +1516,10 @@ Por exemplo, ativar o método de autenticação `foo` o tornará acessível em `
 *   path(string: <required>)– Especifica o caminho no qual habilitar o método de autenticação. Isso faz parte do URL da solicitação.  
     ![](images/image2.png)
 *   description (string: "")– Especifica uma descrição amigável do método de autenticação.
-*   type (string: <required>)– Especifica o nome do tipo de método de autenticação, como "github" ou "token".
+*   type (string: <required>)– Especifica o nome do tipo de método de autenticação, como `github` ou `token`.
 *   config (map<string|string>: nil)– Especifica opções de configuração para este método de autenticação. Estes são os valores possíveis:
 
-*   default_lease_ttl (string: "")\- A duração da concessão padrão, especificada como uma duração de string como "5s" ou "30m".
+*   default_lease_ttl (string: "")\- A duração da concessão padrão, especificada como uma duração de string como `5s` ou `30m`.
 *   [max_lease_ttl](https://www.google.com/url?q=https://developer.hashicorp.com/vault/api-docs/system/auth%23max_lease_ttl&sa=D&source=editors&ust=1671633434776074&usg=AOvVaw0agmqbG94yFyGjuean2YBr) (string: "")\- A duração máxima da concessão, especificada como uma duração de string como "5s" ou "30m".
 *   audit_non_hmac_request_keys (array: \[\])\- Lista de chaves que não serão HMAC'd por dispositivos de auditoria no objeto de dados de solicitação.
 *   audit_non_hmac_response_keys (array: \[\])\- Lista de chaves que não serão HMAC'd por dispositivos de auditoria no objeto de dados de resposta.
@@ -1817,17 +1527,14 @@ Por exemplo, ativar o método de autenticação `foo` o tornará acessível em `
 *   passthrough_request_headers (array: \[\])\- Lista de cabeçalhos para a lista de permissões e passar da solicitação para o plug-in.
 *   allowed_response_headers (array: \[\])\- Lista de cabeçalhos para lista branca, permitindo que um plugin os inclua na resposta.
 
-*   plugin_version (string: "")– Especifica a versão semântica do plug-in a ser usado, por exemplo, "v1.0.0". Se não for especificado, o servidor selecionará qualquer plug-in não versionado correspondente que possa ter sido registrado, o plug-in com versão mais recente registrado ou um plug-in integrado nessa ordem de precedência.
+*   plugin_version (string: "")– Especifica a versão semântica do plug-in a ser usado, por exemplo, `v1.0.0`. Se não for especificado, o servidor selecionará qualquer plug-in não versionado correspondente que possa ter sido registrado, o plug-in com versão mais recente registrado ou um plug-in integrado nessa ordem de precedência.
 
 ### Sample Payload
 
 ```json
 {
-
   "type": "github",
-
   "description": "Login with GitHub"
-
 }
 ```
 
@@ -1835,13 +1542,9 @@ Por exemplo, ativar o método de autenticação `foo` o tornará acessível em `
 
 ```shell
 curl \
-
     --header "X-Vault-Token: ..." \
-
     --request POST \
-
     --data @payload.json \
-
     http://127.0.0.1:8200/v1/sys/auth/my-auth
 ```
 
@@ -1856,9 +1559,7 @@ Esses endpoints retornam a configuração do método auth no caminho fornecido.
 
 ```shell
 curl \
-
     --header "X-Vault-Token: ..." \
-
     http://127.0.0.1:8200/v1/sys/auth/my-auth
 ```
 
@@ -1911,11 +1612,8 @@ Este endpoint desativa o método auth no caminho de autenticação fornecido.
 
 ```shell
 curl \
-
     --header "X-Vault-Token: ..." \
-
     --request DELETE \
-
     http://127.0.0.1:8200/v1/sys/auth/my-auth
 ```
 
