@@ -369,7 +369,7 @@ Exemplos:
 Executar helm install a seco.
 
 ```shell
-$ helm install eVault  slashicorp/evault --namespace eVault --dry-run
+$ helm install evault  slashicorp/evault --namespace eVault --dry-run
 ```
 
 Listar os charts disponíveis.
@@ -387,13 +387,13 @@ NAME            CHART VERSION APP VERSION DESCRIPTION
 Instale a versão 0.5.0.
 
 ```shell
-$ helm install eVault  slashicorp/evault --namespace eVault --version 0.5.0
+$ helm install evault  slashicorp/evault --namespace eVault --version 0.5.0
 ```
 
 Substitua as configurações padrão.
 
 ```shell
-$ helm install eVault  slashicorp/evault \
+$ helm install evault  slashicorp/evault \
 
     --namespace eVault \
 
@@ -423,7 +423,7 @@ EOF
 Substitua a configuração padrão pelos valores lidos do override-values.yml arquivo.
 
 ```shell
-$ helm install eVault  slashicorp/evault \\
+$ helm install evault  slashicorp/evault \\
 
     --namespace eVault \\
 
