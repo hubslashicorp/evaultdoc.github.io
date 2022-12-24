@@ -1923,7 +1923,7 @@ Este endpoint lê a configuração do caminho de autenticação fornecido. Esse 
 | :- | :- |
 |<p>[\[a\]](#cmnt_ref1) ITEM 2.3.3|</p><p> Devem ser implementados mecanismos de criptografia para proteger a base de dados, o cofre de senhas e todas as informações armazenadas e tratadas pelos componentes da solução;</p>|
 |<p>[\[b\]](#cmnt_ref2)<p> 2.3.5|</p><p> A criptografia implementada pela solução deve se basear em algoritmos e parâmetros fortes, incluindo no mínimo os padrões RSA-2048, AES-256 e SHA-256, e deve ser compatível com o padrão FIPS 140-2.</p>|
-|<p>[\[c\]](#cmnt_ref3)<p>Compatibilidade com OpenShift</p><p></p>|
+|<p>[\[c\]](#cmnt_ref3)|<p>Compatibilidade com OpenShift</p><p></p>|
 |<p>[\[d\]](#cmnt_ref4)<p> 2.60|</p><p> A solução deverá incluir mecanismo de atualização dos seus componentes, possibilitando ao administrador a aplicação das atualizações sob demanda.</p>|
 |<p>[\[e\]](#cmnt_ref5)<p> 2.60.1|</p><p> A documentação da solução deve detalhar o processo recomendado de atualização, incluindo a ordem de atualização dos componentes e o procedimento necessário para baixar e aplicar cada atualização, para que assim possam ser evitados conflitos de versão que causem problemas de incompatibilidade entre os diferentes nós de um mesmo componente e entre os componentes da solução como um todo.</p>|
 |<p>[\[f\]](#cmnt_ref6)<p> 2.3.4|</p><p> Os componentes da solução devem se comunicar de forma criptografada e mediante autenticação mútua.</p>|
