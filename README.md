@@ -1859,57 +1859,31 @@ curl \
 
 ```json
 {
-
   "request_id": "8d2a1e33-4c00-46a5-f50d-4dc5f5d96f12",
-
   "lease_id": "",
-
   "lease_duration": 0,
-
   "renewable": false,
-
   "data": {
-
     "accessor": "auth_github_badd7fd0",
-
     "config": {
-
       "default_lease_ttl": 0,
-
       "force_no_cache": false,
-
       "max_lease_ttl": 0,
-
       "token_type": "default-service"
-
     },
-
     "deprecation_status": "supported",
-
     "description": "",
-
     "external_entropy_access": false,
-
     "local": false,
-
     "options": null,
-
     "plugin_version": "",
-
-    "running_plugin\_version": "v1.12.0+builtin.vault",
-
-    "running\_sha256": "",
-
-    "seal\_wrap": false,
-
+    "running_plugin_version": "v1.12.0+builtin.vault",
+    "running_sha256": "",
+    "seal_wrap": false,
     "type": "github",
-
     "uuid": "4b42d1a4-0a0d-3c88-ae90-997e0c8b41be"
-
   },
-
   "warnings": null
-
 }
 ```
 
