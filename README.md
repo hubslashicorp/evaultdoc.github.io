@@ -616,7 +616,7 @@ Após a instalação do gráfico do eVault Helm, um dos servidores do eVault pre
 Visualize todos os pods do eVault no namespace atual:
 
 ```shell
-$ kubectl get pods --selector='app.kubernetes.io/name=evault' --namespace=' eVault'
+$ kubectl get pods --selector='app.kubernetes.io/name=evault' --namespace='evault'
 
 NAME                               READY   STATUS    RESTARTS   AGE
 evault-0                            0/1     Running   0          1m49s
