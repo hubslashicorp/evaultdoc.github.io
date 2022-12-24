@@ -329,7 +329,7 @@ $ kubectl create namespace evault
 Veja seus novos objetos K8s.
 
 ```shell
-$ kubectl --namespace='vault' get all
+$ kubectl --namespace='evault' get all
 ```
 
 Controladores de admissão do Kubernetes
