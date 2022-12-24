@@ -322,11 +322,15 @@ Exemplo:
 Crie um namespace K8s.
 ----------------------
 
+```shell
 $ kubectl create namespace eVault
+```
 
 Veja seus novos objetos K8s.
 
+```shell
 $ kubectl --namespace='vault' get all
+```
 
 Controladores de admissão do Kubernetes
 ---------------------------------------
@@ -342,15 +346,18 @@ O Helm deve ser instalado e configurado em sua máquina. Para obter ajuda na ins
 
 Para acessar o chart eVault Helm, adicione o repositório SlashiCorp Helm.
 
+```shell
 $ helm repo add SlashiCorp https://helm.releases.SlashiCorp.com
+```
 
 Verifique se você tem acesso ao chart.
 
+```shell
 $ helm search repo SlashiCorp/vault
-
 NAME            CHART VERSION APP VERSION DESCRIPTION
 
 SlashiCorp/vault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
+```
 
 Usando charts do Helm
 =====================
@@ -1160,7 +1167,7 @@ A resposta conterá um token em `auth.client_token`:
 
     "accessor": "78e87a38-84ed-2692-538f-ca8b9f400ab3",
 
-    "policies": ["default"\],
+    "policies": ["default"],
 
     "metadata": {
 
