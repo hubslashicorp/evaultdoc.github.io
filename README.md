@@ -1945,7 +1945,6 @@ Este endpoint lê a configuração do caminho de autenticação fornecido. Esse 
 
 *   sudo required – esse ponto de extremidade requer sudo recursos além de quaisquer recursos específicos do caminho.
 
-|TÓPICO||
 | :- | :- |
 |  **ITEM**  |  **Descricao**  |
 |<p>[\[a\]](#cmnt_ref1) ITEM 2.3.3|</p><p> Devem ser implementados mecanismos de criptografia para proteger a base de dados, o cofre de senhas e todas as informações armazenadas e tratadas pelos componentes da solução;</p>|
