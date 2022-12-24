@@ -347,7 +347,7 @@ O Helm deve ser instalado e configurado em sua máquina. Para obter ajuda na ins
 Para acessar o chart eVault Helm, adicione o repositório SlashiCorp Helm.
 
 ```shell
-$ helm repo add SlashiCorp https://helm.releases.SlashiCorp.com
+$ helm repo add slashisorp https://helm.releases.SlashiCorp.com
 ```
 
 Verifique se você tem acesso ao chart.
