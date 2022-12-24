@@ -323,7 +323,7 @@ Crie um namespace K8s.
 ----------------------
 
 ```shell
-$ kubectl create namespace eVault
+$ kubectl create namespace evault
 ```
 
 Veja seus novos objetos K8s.
@@ -369,7 +369,7 @@ Exemplos:
 Executar helm install a seco.
 
 ```shell
-$ helm install evault  slashicorp/evault --namespace eVault --dry-run
+$ helm install evault  slashicorp/evault --namespace evault --dry-run
 ```
 
 Listar os charts disponíveis.
@@ -387,7 +387,7 @@ NAME            CHART VERSION APP VERSION DESCRIPTION
 Instale a versão 0.5.0.
 
 ```shell
-$ helm install evault  slashicorp/evault --namespace eVault --version 0.5.0
+$ helm install evault  slashicorp/evault --namespace evault --version 0.5.0
 ```
 
 Substitua as configurações padrão.
@@ -395,7 +395,7 @@ Substitua as configurações padrão.
 ```shell
 $ helm install evault  slashicorp/evault \
 
-    --namespace eVault \
+    --namespace evault \
 
     --set "server.ha.enabled=true" \
 
@@ -425,7 +425,7 @@ Substitua a configuração padrão pelos valores lidos do override-values.yml ar
 ```shell
 $ helm install evault  slashicorp/evault \\
 
-    --namespace eVault \\
+    --namespace evault \\
 
     -f override-values.yml \\
 
@@ -705,7 +705,7 @@ Instalando o eVault
 Depois de terminar de criar o override-values.yam larquivo, vá em frente e instale a versão mais recente do gráfico do eVault Helm no eVault namespace com os parâmetros override-values.yml aplicados.
 
 ```shell
-$ helm install evault slashisorp/evault --namespace eVault -f override-values.yaml
+$ helm install evault slashisorp/evault --namespace evault -f override-values.yaml
 ```
 
 Inicializar e abrir o eVault
