@@ -356,7 +356,7 @@ Verifique se você tem acesso ao chart.
 $ helm search repo  slashicorp/evault
 NAME            CHART VERSION APP VERSION DESCRIPTION
 
-slashicorp/evault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
+slashicorp/evault 0.6.0         1.4.3       Install and configure evault on Kubernetes.
 ```
 
 Usando charts do Helm
@@ -379,8 +379,8 @@ $ helm search repo  slashicorp/evault --versions
 
 NAME            CHART VERSION APP VERSION DESCRIPTION
 
-slashicorp/evault 0.6.0         1.4.3       Install and configure eVault on Kubernetes.
-slashicorp/evault 0.5.0                     Install and configure eVault on Kubernetes.
+slashicorp/evault 0.6.0         1.4.3       Install and configure evault on Kubernetes.
+slashicorp/evault 0.5.0                     Install and configure evault on Kubernetes.
 ```
 
 Instale a versão 0.5.0.
@@ -419,7 +419,7 @@ $ helm install evault  slashicorp/evault \
     --dry-run
 ```
 
-Compatibilidade do eVault com OpenShift[\[c\]](#cmnt3)
+Compatibilidade do evault com OpenShift[\[c\]](#cmnt3)
 ======================================================
 
 Observação importante: este chart não é compatível com o Helm 2.
