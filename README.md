@@ -620,8 +620,8 @@ $ kubectl get pods --selector='app.kubernetes.io/name=evault' --namespace=' eVau
 
 NAME                               READY   STATUS    RESTARTS   AGE
 evault-0                            0/1     Running   0          1m49s
-vault-1                            0/1     Running   0          1m49s
-vault-2                            0/1     Running   0          1m49s
+evault-1                            0/1     Running   0          1m49s
+evault-2                            0/1     Running   0          1m49s
 ```
 
 Inicialize um servidor eVault com o número padrão de compartilhamentos de chave e limite de chave padrão:
@@ -657,8 +657,8 @@ $ kubectl get pods --selector='app.kubernetes.io/name=evault'
 
 NAME                                READY   STATUS    RESTARTS   AGE
 evault-0                              1/1     Running   0          1m49s
-vault-1                              1/1     Running   0          1m49s
-vault-2                              1/1     Running   0          1m49s
+evault-1                              1/1     Running   0          1m49s
+evault-2                              1/1     Running   0          1m49s
 ```
 
 Guia de atualização do eVault

@@ -55,7 +55,7 @@ spec:
           - "-domain=cluster.local"
           - "-datacenter=dc1"
           - "-disable-host-node-id"
-          - "-node=vault-1"
+          - "-node=evault-1"
         volumeMounts:
             - name: config
               mountPath: /consul/myconfig
