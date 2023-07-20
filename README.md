@@ -1,4 +1,4 @@
-Estabilis Vault - Documentation
+Elastic Vault - Documentation
 
 [×](javascript:void(0))
 
