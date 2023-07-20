@@ -516,7 +516,7 @@ Aqui está um fragmento de como um pod de aplicativo seria instrumentado para us
 ```yaml
 initContainers:
 # eVault Agent Init
-      - image: evault:1.12.1
+      - image: slashicorp/evault:1.13.1
         name: evault-agent-init
         ports:
         - containerPort: 8200
@@ -933,7 +933,7 @@ Esse mecanismo de segredos respeita a distinção entre os recursos create e upd
 Para habilitar um armazenamento kv versão 1:
 
 ```shell
-$ evault secrets enable -version=1 kv
+$ vault secrets enable -version=1 kv
 ```
 
 #### Uso
@@ -943,7 +943,7 @@ Depois que o mecanismo de segredos é configurado e um `usuário/máquina` possu
 1.  Escrever dados arbitrários:
 
 ```shell
-$ evault kv put kv/my-secret my-value=s3cr3t
+$ vault kv put kv/my-secret my-value=s3cr3t
 
 Success! Data written to: kv/my-secret
 ```
@@ -951,7 +951,7 @@ Success! Data written to: kv/my-secret
 2.  Leia dados arbitrários:
 
 ```shell
-$ evault kv get kv/my-secret  
+$ vault kv get kv/my-secret  
   
 Key                 Value
 
@@ -963,7 +963,7 @@ my-value            s3cr3t
 3.  Liste as chaves:
 
 ```shell
-$ eVault kv list kv
+$ vault kv list kv
 
 Keys
 
@@ -975,7 +975,7 @@ my-secret
 4.  Excluir uma chave:
 
 ```shell
-$ evault kv delete kv/my-secret
+$ vault kv delete kv/my-secret
 
 Success! Data deleted (if it existed) at: kv/my-secret
 ```
@@ -987,7 +987,7 @@ Ao contrário de outros mecanismos de segredos, o mecanismo de segredos KV não 
 Se for fornecida uma chave de ttl, o mecanismo de segredos KV utilizará esse valor como a duração da concessão:
 
 ```shell
-$ evault kv put kv/my-secret ttl=30m my-value=s3cr3t
+$ vault kv put kv/my-secret ttl=30m my-value=s3cr3t
 
 Success! Data written to: kv/my-secret
 ```
@@ -997,7 +997,7 @@ Mesmo com um ttl conjunto, o mecanismo de segredos nunca remove os dados por con
 Ao ler um valor com um ttl, a ttl chave e o intervalo de atualização refletirão o valor:
 
 ```shell
-$ evault kv get kv/my-secret 
+$ vault kv get kv/my-secret 
  
 Key                 Value
 
