@@ -204,7 +204,7 @@ E V A U L T     T I G H T L Y    C O N T R O L S     A C C E S S
 
 Secures, Stores, Tokens, Passwords, Certificates, API  
 Keys and other secrets in modern computing.  
-by estabil.is | slashicorp.com.br 
+by slashicorp.com.br 
 
 ![](images/image20.png "linha horizontal")
 
