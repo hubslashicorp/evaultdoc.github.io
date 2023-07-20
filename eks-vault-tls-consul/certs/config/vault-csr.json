@@ -1,0 +1,18 @@
+{
+  "hosts": [
+    "vault",
+    "127.0.0.1",
+    "vault.tech.com"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "Singapore",
+      "ST": "Singapore",
+      "L": "Singapore"
+    }
+  ]
+}
